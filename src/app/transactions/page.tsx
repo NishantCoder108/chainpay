@@ -1,3 +1,4 @@
+"use client";
 import Transactions from "@/components/Transactions";
 import React from "react";
 
