@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -11,14 +11,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogFooter,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
+import { Dialog } from "@/components/ui/dialog";
 import {
     WalletIcon,
     SearchIcon,
@@ -27,7 +20,9 @@ import {
     XCircleIcon,
     AlertCircleIcon,
 } from "lucide-react";
-
+import { useWallet } from "@solana/wallet-adapter-react";
+import { SOLBalance } from "./wallets/SOLBalance";
+import SendTransaction from "./wallets/SendTransaction";
 type User = {
     id: number;
     name: string;
@@ -40,7 +35,7 @@ const users = [
     {
         id: 1,
         name: "Alice",
-        walletAddress: "5xjP...q1X9",
+        walletAddress: "4xLjCB5GgT6FhyshwG3ARFYMPk2oH2aMP2eDEqUhEhqx",
         email: "alice@example.com",
         country: "USA",
     },
@@ -85,10 +80,10 @@ const transactions = [
 ];
 
 export default function TrasactionDashboard() {
+    const wallet = useWallet();
     const [isWalletConnected, setIsWalletConnected] = useState(false);
     const [selectedUsers, setSelectedUsers] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [solAmount, setSolAmount] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
     const [usersList, setUsersList] = useState(users);
 
@@ -99,9 +94,7 @@ export default function TrasactionDashboard() {
             user.walletAddress.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const handleWalletConnection = () => {
-        setIsWalletConnected(!isWalletConnected);
-    };
+    console.log({ wallet });
 
     const handleUserSelection = (userId: number) => {
         const filterUserList = usersList.filter(
@@ -115,15 +108,10 @@ export default function TrasactionDashboard() {
     };
 
     console.log({ selectedUsers });
-    const handleSendTransaction = () => {
-        console.log(
-            `Sending ${solAmount} SOL to ${selectedUsers.length} users`
-        );
-        setIsModalOpen(false);
-        setSolAmount("");
-        setSelectedUsers([]);
-    };
 
+    useEffect(() => {
+        setIsWalletConnected(wallet.connected);
+    }, [wallet.connected]);
     return (
         <div className="min-h-screen bg-gray-100 p-8">
             <div className="max-w-7xl mx-auto">
@@ -131,15 +119,12 @@ export default function TrasactionDashboard() {
                     <h1 className="text-3xl font-bold text-gray-800">
                         SOL Admin Dashboard
                     </h1>
-                    <Button
-                        onClick={handleWalletConnection}
-                        variant={isWalletConnected ? "outline" : "default"}
-                    >
+                    <div className="flex items-center text-black">
                         <WalletIcon className="mr-2 h-4 w-4" />
-                        {isWalletConnected
-                            ? "Disconnect Wallet"
-                            : "Connect Wallet"}
-                    </Button>
+                        {/* {isWalletConnected ? "Disconnect " : "Connect "} */}
+
+                        <SOLBalance />
+                    </div>
                 </header>
 
                 <div className="bg-white rounded-lg shadow p-6 mb-8">
@@ -247,32 +232,7 @@ export default function TrasactionDashboard() {
             </div>
 
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Send SOL to Selected Users</DialogTitle>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="sol-amount" className="text-right">
-                                SOL Amount
-                            </Label>
-                            <Input
-                                id="sol-amount"
-                                value={solAmount}
-                                onChange={(e) => setSolAmount(e.target.value)}
-                                className="col-span-3"
-                                type="number"
-                                min="0"
-                                step="0.1"
-                            />
-                        </div>
-                    </div>
-                    <DialogFooter>
-                        <Button type="submit" onClick={handleSendTransaction}>
-                            Send Transaction
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
+                <SendTransaction selectedUsers={selectedUsers} />
             </Dialog>
         </div>
     );
