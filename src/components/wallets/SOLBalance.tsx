@@ -36,7 +36,7 @@ export const SOLBalance = () => {
     return (
         <div>
             <p className="font-semibold text-slate-600 ">
-                {solBal.toPrecision(3)} SOL
+                {solBal.toFixed(5)} SOL
             </p>
         </div>
     );
