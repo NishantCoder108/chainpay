@@ -23,6 +23,7 @@ import {
 import { useWallet } from "@solana/wallet-adapter-react";
 import { SOLBalance } from "./wallets/SOLBalance";
 import SendTransaction from "./wallets/SendTransaction";
+import SendBatchTransaction from "./wallets/SendBatchTransaction";
 type User = {
     id: number;
     name: string;
@@ -42,7 +43,7 @@ const users = [
     {
         id: 2,
         name: "Bob",
-        walletAddress: "7yK2...m3Z8",
+        walletAddress: "2uKCWNYJvBijL76a4f4xfUY1y4p9e6ZLyqnyBq68CTAy",
         email: "bob@example.com",
         country: "Canada",
     },
@@ -232,7 +233,8 @@ export default function TrasactionDashboard() {
             </div>
 
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                <SendTransaction selectedUsers={selectedUsers} />
+                {/* <SendTransaction selectedUsers={selectedUsers} /> */}
+                <SendBatchTransaction dropList={selectedUsers as []} />
             </Dialog>
         </div>
     );

@@ -11,9 +11,12 @@ import {
     WalletMultiButton,
 } from "@solana/wallet-adapter-react-ui";
 import "@solana/wallet-adapter-react-ui/styles.css";
-import { useEffect, useState } from "react";
+import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
+import { useEffect, useMemo, useState } from "react";
 
 export default function Home() {
+    const wallets = useMemo(() => [new PhantomWalletAdapter()], []);
+
     const endpoint = process.env.NEXT_PUBLIC_RPC_URL as string;
     console.log({ endpoint });
 
@@ -26,6 +29,7 @@ export default function Home() {
     if (!hasMounted) {
         return null;
     }
+
     return (
         <ConnectionProvider endpoint={endpoint}>
             <WalletProvider wallets={[]} autoConnect>
