@@ -1,5 +1,5 @@
 "use client";
-import TransactionDashboard from "./transactions/page";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 import {
     ConnectionProvider,
@@ -11,12 +11,11 @@ import {
     WalletMultiButton,
 } from "@solana/wallet-adapter-react-ui";
 import "@solana/wallet-adapter-react-ui/styles.css";
-import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
-import { useEffect, useMemo, useState } from "react";
+// import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
+import { useEffect, useState } from "react";
+import Dashboard from "@/components/dashboard/Dashboard";
 
 export default function Home() {
-    const wallets = useMemo(() => [new PhantomWalletAdapter()], []);
-
     const endpoint = process.env.NEXT_PUBLIC_RPC_URL as string;
     console.log({ endpoint });
 
@@ -42,7 +41,9 @@ export default function Home() {
                 </WalletModalProvider>
 
                 <div>
-                    <TransactionDashboard />
+                    <TooltipProvider>
+                        <Dashboard />
+                    </TooltipProvider>
                 </div>
             </WalletProvider>
         </ConnectionProvider>

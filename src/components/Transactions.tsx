@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { SOLBalance } from "./wallets/SOLBalance";
-import SendTransaction from "./wallets/SendTransaction";
+// import SendTransaction from "./wallets/SendTransaction";
 import SendBatchTransaction from "./wallets/SendBatchTransaction";
 type User = {
     id: number;
@@ -86,7 +86,7 @@ export default function TrasactionDashboard() {
     const [selectedUsers, setSelectedUsers] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
-    const [usersList, setUsersList] = useState(users);
+    const [usersList] = useState(users);
 
     const filteredUsers = users.filter(
         (user) =>

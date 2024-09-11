@@ -81,7 +81,7 @@ const SendBatchTransaction: React.FC<BatchTransactionProps> = ({
                         "processed"
                     );
                     console.log({ confTransc });
-
+                    alert("Successful Transaction!");
                     const statusSign = await connection.getSignatureStatuses([
                         signature,
                     ]);
