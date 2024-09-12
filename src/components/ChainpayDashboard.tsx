@@ -60,8 +60,26 @@ export default function ChainpayDashboard() {
     const [totalTransactions, setTotalTransactions] = useState(1234);
     const [totalUsers, setTotalUsers] = useState(567);
 
+    const containerVariants = {
+        hidden: { opacity: 0, y: -50 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: {
+                type: "spring",
+                stiffness: 100,
+                damping: 15,
+                staggerChildren: 0.1,
+            },
+        },
+    };
     return (
-        <div className="space-y-8">
+        <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="space-y-8"
+        >
             <div className="grid gap-4 md:grid-cols-3">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -189,6 +207,6 @@ export default function ChainpayDashboard() {
                     </div>
                 </div>
             </div>
-        </div>
+        </motion.div>
     );
 }
