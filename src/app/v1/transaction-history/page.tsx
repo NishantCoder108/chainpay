@@ -1,7 +1,13 @@
+"use client";
+import TransactionHistory from "@/components/paymentHistory/TransactionHistory";
 import React from "react";
 
-const TransactionHistory = () => {
-    return <div>TransactionHistory</div>;
+const PaymentHistory = () => {
+    return (
+        <div>
+            <TransactionHistory />
+        </div>
+    );
 };
 
-export default TransactionHistory;
+export default PaymentHistory;
