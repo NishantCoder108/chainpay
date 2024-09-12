@@ -22,9 +22,9 @@ const ConnectWallet = () => {
     const isWalletConnected = wallet.connected;
 
     return (
-        <div className="flex items-center justify-center gap-3">
-            <div className="flex items-center text-black ">
-                <WalletIcon className="mr-2 h-4 w-4" />
+        <div className="flex items-center justify-center sm:gap-3">
+            <div className=" flex items-center text-black   ">
+                <WalletIcon className="mr-2 h-4 w-4  hidden   sm:block" />
                 <SOLBalance />
             </div>
             <WalletModalProvider>

@@ -37,8 +37,9 @@ export const SOLBalance = () => {
 
     return (
         <div>
-            <p className="font-semibold text-slate-600 text-sm  ">
-                {solBal.toFixed(5)} SOL
+            <p className="font-semibold text-slate-600 text-sm flex items-center gap-1 ">
+                {solBal.toFixed(5)}{" "}
+                <span className="hidden sm:block"> SOL </span>
             </p>
         </div>
     );

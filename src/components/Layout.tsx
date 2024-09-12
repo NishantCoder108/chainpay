@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -45,21 +45,21 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
     const pathname = usePathname();
 
-    const handleWalletConnection = () => {
-        setIsWalletConnected(!isWalletConnected);
-        if (!isWalletConnected) {
-            setWalletBalance(100);
-            setWalletAddress("5xjP...q1X9");
-        } else {
-            setWalletBalance(0);
-            setWalletAddress("");
-        }
-    };
-
     const toggleSidebar = () => {
         setIsSidebarCollapsed(!isSidebarCollapsed);
     };
 
+    useEffect(() => {
+        const handleResize = () => {
+            setIsSidebarCollapsed(window.innerWidth <= 900);
+        };
+
+        handleResize();
+
+        window.addEventListener("resize", handleResize);
+
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
     return (
         <div className="flex h-screen bg-gray-100  dark:bg-gray-900">
             {/* Sidebar */}
@@ -156,8 +156,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <div className="flex-1 flex flex-col overflow-hidden">
                 {/* Navbar */}
                 <header className="bg-white  shadow-md">
-                    <div className="flex justify-between items-center p-4">
-                        <h2 className="text-lg font-bold text-gray-800 dark:text-white">
+                    <div className="flex justify-between  items-center p-4">
+                        <h2 className="text-lg font-bold text-gray-800 ">
                             {navItems.find((item) => item.path === pathname)
                                 ?.label || "Dashboard"}
                         </h2>
