@@ -1,7 +1,13 @@
+"use client";
+import TrasactionDashboard from "@/components/Transactions";
 import React from "react";
 
 const SendTransactionDashboard = () => {
-    return <div>SendTransactionDashboard</div>;
+    return (
+        <div>
+            <TrasactionDashboard />
+        </div>
+    );
 };
 
 export default SendTransactionDashboard;

@@ -5,7 +5,11 @@ export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
-export const handleCopy = (text: string) => {
-    navigator.clipboard.writeText(text);
-    alert("Wallet address copied!");
+export const formattedLongString = (txt: string): string => {
+    const startPart = txt.slice(0, 4);
+    const endPart = txt.slice(-4);
+
+    const addPart = `${startPart}..${endPart}`;
+
+    return addPart;
 };
