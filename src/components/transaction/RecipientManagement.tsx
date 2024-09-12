@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,10 +29,24 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { UserPlusIcon, XIcon, SendIcon } from "lucide-react";
-import { containerVariants, itemVariants } from "@/lib/utils";
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import {
+    UserPlusIcon,
+    XIcon,
+    SendIcon,
+    CalendarIcon,
+    SearchIcon,
+    GlobeIcon,
+    FilterIcon,
+} from "lucide-react";
+import { format } from "date-fns";
 
-// Mock data for users
+// Mock data for users (in a real app, this would come from a database)
 const initialUsers = [
     {
         id: 1,
@@ -40,6 +54,7 @@ const initialUsers = [
         email: "alice@example.com",
         walletAddress: "5xjP...q1X9",
         country: "USA",
+        addedAt: new Date(2023, 5, 1),
     },
     {
         id: 2,
@@ -47,6 +62,7 @@ const initialUsers = [
         email: "bob@example.com",
         walletAddress: "7yK2...m3Z8",
         country: "Canada",
+        addedAt: new Date(2023, 5, 15),
     },
     {
         id: 3,
@@ -54,6 +70,7 @@ const initialUsers = [
         email: "charlie@example.com",
         walletAddress: "9wR5...b6Y4",
         country: "UK",
+        addedAt: new Date(2023, 6, 1),
     },
     {
         id: 4,
@@ -61,6 +78,7 @@ const initialUsers = [
         email: "diana@example.com",
         walletAddress: "3zM8...k7L2",
         country: "Australia",
+        addedAt: new Date(2023, 6, 15),
     },
     {
         id: 5,
@@ -68,6 +86,7 @@ const initialUsers = [
         email: "ethan@example.com",
         walletAddress: "1qA9...j6P5",
         country: "Germany",
+        addedAt: new Date(2023, 7, 1),
     },
 ];
 
@@ -82,9 +101,7 @@ const countries = [
     "Brazil",
     "India",
     "South Africa",
-    "Other",
 ];
-
 interface IUser {
     id: number;
     name: string;
@@ -92,6 +109,7 @@ interface IUser {
     walletAddress: string;
     country: string;
 }
+
 export default function RecipientManagement() {
     const [users, setUsers] = useState<IUser[]>(initialUsers);
     const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
@@ -104,8 +122,31 @@ export default function RecipientManagement() {
         email: "",
         walletAddress: "",
         country: "",
+        addedAt: new Date(),
     });
     const [isSending, setIsSending] = useState(false);
+    const [filters, setFilters] = useState({
+        search: "",
+        country: "",
+        startDate: null,
+        endDate: null,
+    });
+
+    const filteredUsers = useMemo(() => {
+        return users.filter((user) => {
+            const searchLower = filters.search.toLowerCase();
+            const matchesSearch =
+                user.name.toLowerCase().includes(searchLower) ||
+                user.email.toLowerCase().includes(searchLower) ||
+                user.walletAddress.toLowerCase().includes(searchLower);
+            const matchesCountry =
+                !filters.country || user.country === filters.country;
+            const matchesDateRange =
+                (!filters.startDate || user.addedAt >= filters.startDate) &&
+                (!filters.endDate || user.addedAt <= filters.endDate);
+            return matchesSearch && matchesCountry && matchesDateRange;
+        });
+    }, [users, filters]);
 
     const handleUserSelection = (userId: number) => {
         setSelectedUsers((prev) =>
@@ -145,9 +186,42 @@ export default function RecipientManagement() {
 
     const handleAddUser = () => {
         const newUserId = users.length + 1;
-        setUsers([...users, { id: newUserId, ...newUser }]);
-        setNewUser({ name: "", email: "", walletAddress: "", country: "" });
+        setUsers([
+            ...users,
+            {
+                id: newUserId,
+                ...newUser,
+
+                // addedAt: new Date()
+            },
+        ]);
+        setNewUser({
+            name: "",
+            email: "",
+            walletAddress: "",
+            country: "",
+            addedAt: new Date(),
+        });
         setIsAddUserDialogOpen(false);
+    };
+
+    const containerVariants = {
+        hidden: { opacity: 0, y: -50 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: {
+                type: "spring",
+                stiffness: 100,
+                damping: 15,
+                staggerChildren: 0.1,
+            },
+        },
+    };
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: -20 },
+        visible: { opacity: 1, y: 0 },
     };
 
     return (
@@ -158,9 +232,9 @@ export default function RecipientManagement() {
             animate="visible"
         >
             <motion.div variants={itemVariants}>
-                <Card className="h-[75vh]">
+                <Card>
                     <CardContent className="pt-6">
-                        <div className="flex justify-between items-center mb-4">
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 space-y-4 sm:space-y-0">
                             <h2 className="text-2xl font-bold">
                                 Recipient Selection
                             </h2>
@@ -169,9 +243,15 @@ export default function RecipientManagement() {
                                 onOpenChange={setIsAddUserDialogOpen}
                             >
                                 <DialogTrigger asChild>
-                                    <Button className="ml-auto" size="sm">
+                                    <Button
+                                        className="w-full sm:w-auto"
+                                        size="sm"
+                                    >
                                         <UserPlusIcon className="mr-2 h-4 w-4" />
-                                        Add Recipient
+                                        <span className="hidden sm:inline">
+                                            Add Recipient
+                                        </span>
+                                        <span className="sm:hidden">Add</span>
                                     </Button>
                                 </DialogTrigger>
                                 <DialogContent>
@@ -282,47 +362,179 @@ export default function RecipientManagement() {
                                 </DialogContent>
                             </Dialog>
                         </div>
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="w-[50px]">
-                                        Select
-                                    </TableHead>
-                                    <TableHead>Name</TableHead>
-                                    <TableHead>Email</TableHead>
-                                    <TableHead>Wallet Address</TableHead>
-                                    <TableHead>Country</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                <AnimatePresence>
-                                    {users.map((user) => (
-                                        <tr key={user.id}>
-                                            <TableCell>
-                                                <Checkbox
-                                                    checked={selectedUsers.includes(
-                                                        Number(user.id)
-                                                    )}
-                                                    onCheckedChange={() =>
-                                                        handleUserSelection(
-                                                            user.id
-                                                        )
-                                                    }
-                                                />
-                                            </TableCell>
-                                            <TableCell>{user.name}</TableCell>
-                                            <TableCell>{user.email}</TableCell>
-                                            <TableCell>
-                                                {user.walletAddress}
-                                            </TableCell>
-                                            <TableCell>
-                                                {user.country}
-                                            </TableCell>
-                                        </tr>
+
+                        {/* ksdjf------ */}
+
+                        <div className="flex flex-col sm:flex-row flex-wrap gap-4 mb-4">
+                            <div className="flex-1 min-w-[200px]">
+                                <div className="relative">
+                                    <SearchIcon className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                                    <Input
+                                        placeholder="Search..."
+                                        value={filters.search}
+                                        onChange={(e) =>
+                                            setFilters({
+                                                ...filters,
+                                                search: e.target.value,
+                                            })
+                                        }
+                                        className="pl-8 w-full"
+                                    />
+                                </div>
+                            </div>
+                            <Select
+                                value={filters.country}
+                                onValueChange={(value) =>
+                                    setFilters({ ...filters, country: value })
+                                }
+                            >
+                                <SelectTrigger className="w-full sm:w-[180px]">
+                                    <SelectValue placeholder="Country" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="India">
+                                        All Countries
+                                    </SelectItem>
+                                    {countries.map((country) => (
+                                        <SelectItem
+                                            key={country}
+                                            value={country}
+                                        >
+                                            {country}
+                                        </SelectItem>
                                     ))}
-                                </AnimatePresence>
-                            </TableBody>
-                        </Table>
+                                </SelectContent>
+                            </Select>
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        className="w-full sm:w-auto justify-start text-left font-normal"
+                                    >
+                                        <CalendarIcon className="mr-2 h-4 w-4" />
+                                        <span className="hidden sm:inline">
+                                            {filters.startDate &&
+                                            filters.endDate ? (
+                                                <>
+                                                    {format(
+                                                        filters.startDate,
+                                                        "PP"
+                                                    )}{" "}
+                                                    -{" "}
+                                                    {format(
+                                                        filters.endDate,
+                                                        "PP"
+                                                    )}
+                                                </>
+                                            ) : (
+                                                <span>Date range</span>
+                                            )}
+                                        </span>
+                                        <span className="sm:hidden">Date</span>
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent
+                                    className="w-auto p-0"
+                                    align="start"
+                                >
+                                    <Calendar
+                                        mode="range"
+                                        selected={{
+                                            from: filters.startDate,
+                                            to: filters.endDate,
+                                            // from: new Date(),
+                                            // to: new Date(),
+                                        }}
+                                        onSelect={(range) =>
+                                            setFilters({
+                                                ...filters,
+                                                startDate: range?.from || null,
+                                                endDate: range?.to || null,
+                                            })
+                                        }
+                                        initialFocus
+                                    />
+                                </PopoverContent>
+                            </Popover>
+                            <Button
+                                variant="outline"
+                                onClick={() =>
+                                    setFilters({
+                                        search: "",
+                                        country: "",
+                                        startDate: null,
+                                        endDate: null,
+                                    })
+                                }
+                                className="w-full sm:w-auto"
+                            >
+                                <FilterIcon className="mr-2 h-4 w-4" />
+                                <span className="hidden sm:inline">
+                                    Clear Filters
+                                </span>
+                                <span className="sm:hidden">Clear</span>
+                            </Button>
+                        </div>
+
+                        {/* dfldkfdf----- */}
+                        <div className="overflow-x-auto">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead className="w-[50px]">
+                                            Select
+                                        </TableHead>
+                                        <TableHead>Name</TableHead>
+                                        <TableHead className="hidden sm:table-cell">
+                                            Email
+                                        </TableHead>
+                                        <TableHead>Wallet Address</TableHead>
+                                        <TableHead className="hidden md:table-cell">
+                                            Country
+                                        </TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    <AnimatePresence>
+                                        {filteredUsers.map((user) => (
+                                            <motion.tr
+                                                key={user.id}
+                                                variants={itemVariants}
+                                                initial="hidden"
+                                                animate="visible"
+                                                exit="hidden"
+                                                layout
+                                            >
+                                                <TableCell>
+                                                    <Checkbox
+                                                        checked={selectedUsers.includes(
+                                                            user.id
+                                                        )}
+                                                        onCheckedChange={() =>
+                                                            handleUserSelection(
+                                                                user.id
+                                                            )
+                                                        }
+                                                    />
+                                                </TableCell>
+                                                <TableCell>
+                                                    {user.name}
+                                                </TableCell>
+                                                <TableCell className="hidden sm:table-cell">
+                                                    {user.email}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {user.walletAddress}
+                                                </TableCell>
+                                                <TableCell className="hidden md:table-cell">
+                                                    {user.country}
+                                                </TableCell>
+                                            </motion.tr>
+                                        ))}
+                                    </AnimatePresence>
+                                </TableBody>
+                            </Table>
+                        </div>
                     </CardContent>
                 </Card>
             </motion.div>
@@ -332,10 +544,13 @@ export default function RecipientManagement() {
                     <DialogTrigger asChild>
                         <Button
                             disabled={selectedUsers.length === 0}
-                            className="transition-all duration-300 hover:scale-105"
+                            className="transition-all duration-300 hover:scale-105 w-full sm:w-auto"
                         >
                             <SendIcon className="mr-2 h-4 w-4" />
-                            Initiate Transfer
+                            <span className="hidden sm:inline">
+                                Initiate Transfer
+                            </span>
+                            <span className="sm:hidden">Transfer</span>
                         </Button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[425px]">
@@ -390,9 +605,7 @@ export default function RecipientManagement() {
                                     <TableBody>
                                         {users
                                             .filter((user) =>
-                                                selectedUsers.includes(
-                                                    Number(user.id)
-                                                )
+                                                selectedUsers.includes(user.id)
                                             )
                                             .map((user) => (
                                                 <TableRow key={user.id}>
