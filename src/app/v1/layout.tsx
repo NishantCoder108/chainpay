@@ -4,11 +4,22 @@ import {
     ConnectionProvider,
     WalletProvider,
 } from "@solana/wallet-adapter-react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "@solana/wallet-adapter-react-ui/styles.css";
+import LoadingScreen from "@/components/common/LoadingUi";
 
 const Homepage = ({ children }: { children: React.ReactNode }) => {
     const endpoint = process.env.NEXT_PUBLIC_RPC_URL as string;
+    console.log({ endpoint });
+    const [hasMounted, setHasMounted] = useState(false);
+
+    useEffect(() => {
+        setHasMounted(true);
+    }, []);
+
+    if (!hasMounted) {
+        return <LoadingScreen />;
+    }
 
     return (
         <ConnectionProvider endpoint={endpoint}>
