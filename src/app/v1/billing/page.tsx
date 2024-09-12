@@ -1,7 +1,12 @@
+import BillingManagement from "@/components/billing/BillingManagement";
 import React from "react";
 
 const BillingDashboard = () => {
-    return <div>BillingDashboard</div>;
+    return (
+        <div>
+            <BillingManagement />
+        </div>
+    );
 };
 
 export default BillingDashboard;

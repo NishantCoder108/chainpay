@@ -33,7 +33,18 @@ const navItems = [
         label: "Payment History",
         path: "/v1/transaction-history",
     },
-    { icon: CreditCardIcon, label: "Billing", path: "/v1/billing" },
+    {
+        icon: CreditCardIcon,
+        label: "Billing",
+        path: "/v1/billing",
+        subPaths: [
+            {
+                path: "/v1/billing/subscribed",
+                label: "Subscription Management",
+            },
+            { path: "/v1/billing/upgrade", label: "Upgrade Plan" },
+        ],
+    },
 ];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -47,6 +58,30 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
     const toggleSidebar = () => {
         setIsSidebarCollapsed(!isSidebarCollapsed);
+    };
+
+    const getNavLabel = (pathname: string) => {
+        // First, check if the main path matches exactly
+        const mainItem = navItems.find((item) => item.path === pathname);
+
+        if (mainItem) {
+            return mainItem.label;
+        }
+
+        // If no main path match, check if any subPath matches
+        for (const item of navItems) {
+            if (item.subPaths) {
+                const subItem = item.subPaths.find((subPath) =>
+                    pathname.startsWith(subPath.path)
+                );
+                if (subItem) {
+                    return subItem.label;
+                }
+            }
+        }
+
+        // Default fallback label if no match is found
+        return "Dashboard";
     };
 
     useEffect(() => {
@@ -158,8 +193,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 <header className="bg-white  shadow-md">
                     <div className="flex justify-between  items-center p-4">
                         <h2 className="text-lg font-bold text-gray-800 ">
-                            {navItems.find((item) => item.path === pathname)
-                                ?.label || "Dashboard"}
+                            {/* {navItems.find((item) => item.path === pathname)
+                                ?.label || "Dashboard"} */}
+                            {getNavLabel(pathname)}
                         </h2>
                         <div className="flex items-center space-x-4">
                             <ConnectWallet />
