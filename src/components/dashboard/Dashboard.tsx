@@ -6,20 +6,17 @@ import Link from "next/link";
 const Dashboard = () => {
     return (
         <div className="px-8 py-4">
-            {/* Header */}
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-semibold">Dashboard</h1>
                 <Button className="px-4 py-2">Send Transaction</Button>
             </div>
 
-            {/* Cards Section */}
             <motion.div
                 className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
             >
-                {/* Weekly Contributed Transactions */}
                 <Card className="bg-gradient-to-r from-indigo-500 to-blue-500 text-white p-6">
                     <h3 className="text-lg font-bold">
                         Weekly Contributed Transactions
@@ -36,7 +33,6 @@ const Dashboard = () => {
                     </div>
                 </Card>
 
-                {/* Daily Contributed Transactions */}
                 <Card className="bg-gradient-to-r from-green-500 to-teal-500 text-white p-6">
                     <h3 className="text-lg font-bold">
                         Daily Contributed Transactions

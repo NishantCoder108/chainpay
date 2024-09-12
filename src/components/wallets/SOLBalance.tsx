@@ -30,12 +30,14 @@ export const SOLBalance = () => {
     useEffect(() => {
         if (wallet.connected) {
             getBalance();
+        } else {
+            setSolBal(0.0);
         }
     }, [wallet.connected]);
 
     return (
         <div>
-            <p className="font-semibold text-slate-600 ">
+            <p className="font-semibold text-slate-600 text-sm  ">
                 {solBal.toFixed(5)} SOL
             </p>
         </div>

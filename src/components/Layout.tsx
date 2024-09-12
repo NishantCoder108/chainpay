@@ -19,11 +19,11 @@ import {
     HistoryIcon,
     CreditCardIcon,
     LogOutIcon,
-    // MenuIcon,
     ChevronLeftIcon,
     ChevronRightIcon,
     Link as Chain,
 } from "lucide-react";
+import ConnectWallet from "./wallets/ConnectWallet";
 
 const navItems = [
     { icon: LayoutDashboardIcon, label: "Dashboard", path: "/v1/dashboard" },
@@ -162,24 +162,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                                 ?.label || "Dashboard"}
                         </h2>
                         <div className="flex items-center space-x-4">
-                            {isWalletConnected && (
-                                <div className="text-sm text-gray-600 dark:text-gray-300">
-                                    Balance: {walletBalance} SOL |{" "}
-                                    {walletAddress}
-                                </div>
-                            )}
-                            <Button
-                                onClick={handleWalletConnection}
-                                variant={
-                                    isWalletConnected ? "outline" : "default"
-                                }
-                                className="transition-all duration-300 hover:scale-105"
-                            >
-                                <WalletIcon className="mr-2 h-4 w-4" />
-                                {isWalletConnected
-                                    ? "Disconnect"
-                                    : "Connect Wallet"}
-                            </Button>
+                            <ConnectWallet />
                         </div>
                     </div>
                 </header>

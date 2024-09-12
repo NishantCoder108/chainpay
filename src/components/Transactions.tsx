@@ -120,12 +120,6 @@ export default function TrasactionDashboard() {
                     <h1 className="text-3xl font-bold text-gray-800">
                         SOL Admin Dashboard
                     </h1>
-                    <div className="flex items-center text-black">
-                        <WalletIcon className="mr-2 h-4 w-4" />
-                        {/* {isWalletConnected ? "Disconnect " : "Connect "} */}
-
-                        <SOLBalance />
-                    </div>
                 </header>
 
                 <div className="bg-white rounded-lg shadow p-6 mb-8">
