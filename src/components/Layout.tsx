@@ -24,6 +24,7 @@ import {
     Link as Chain,
 } from "lucide-react";
 import ConnectWallet from "./wallets/ConnectWallet";
+import { signOut } from "next-auth/react";
 
 const navItems = [
     { icon: LayoutDashboardIcon, label: "Dashboard", path: "/v1/dashboard" },
@@ -180,6 +181,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     <Button
                         variant="ghost"
                         className="w-full justify-start text-sm  md:text-base"
+                        onClick={() => signOut()}
                     >
                         <LogOutIcon className="sm:mr-2 h-4 w-4" />
                         {!isSidebarCollapsed && "Logout"}

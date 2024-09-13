@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import SessionWrapper from "@/components/common/SessionProvider";
 
 const robotoRegular = localFont({
     src: "./fonts/Roboto-Regular.ttf",
@@ -17,10 +18,12 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en">
-            <body className={`${robotoRegular.className} antialiased`}>
-                {children}
-            </body>
-        </html>
+        <SessionWrapper>
+            <html lang="en">
+                <body className={`${robotoRegular.className} antialiased`}>
+                    {children}
+                </body>
+            </html>
+        </SessionWrapper>
     );
 }

@@ -1,3 +1,4 @@
+import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import {
     Card,
@@ -7,6 +8,7 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { ArrowRight, CheckCircle, Send, Shield, Zap } from "lucide-react";
+import { handleSignIn } from "@/app/actions/dashboardAction";
 
 export default function HomePage() {
     return (
@@ -23,6 +25,7 @@ export default function HomePage() {
                         with just one click.
                     </p>
                     <Button
+                        onClick={() => handleSignIn()}
                         size="lg"
                         className="bg-white text-black hover:bg-gray-200"
                     >
@@ -77,10 +80,10 @@ export default function HomePage() {
                     <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
                         See Our Platform in Action
                     </h2>
-                    <div className="aspect-w-16 aspect-h-9 max-w-4xl mx-auto">
+                    <div className="aspect-w-16 aspect-auto max-w-4xl mx-auto">
                         <iframe
                             className="w-full h-full"
-                            src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                            src="https://www.youtube.com/embed/68IcEa2BRC8"
                             title="Product Demo"
                             frameBorder="0"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
