@@ -1,56 +1,167 @@
-import { motion } from "framer-motion";
-import { Button } from "../ui/button";
-import { Card } from "../ui/card";
-import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card";
+import { ArrowRight, CheckCircle, Send, Shield, Zap } from "lucide-react";
 
-const Dashboard = () => {
+export default function HomePage() {
     return (
-        <div className="px-8 py-4">
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-semibold">Dashboard</h1>
-                <Button className="px-4 py-2">Send Transaction</Button>
-            </div>
+        <div className="min-h-screen bg-white text-black">
+            {/* Hero Section */}
+            <section className="relative h-screen flex items-center justify-center bg-black text-white overflow-hidden">
+                <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-10"></div>
+                <div className="container mx-auto px-4 z-10 text-center">
+                    <h1 className="text-4xl md:text-6xl font-bold mb-6">
+                        Bulk Transactions Made Simple
+                    </h1>
+                    <p className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto">
+                        Send multiple transactions to different wallet addresses
+                        with just one click.
+                    </p>
+                    <Button
+                        size="lg"
+                        className="bg-white text-black hover:bg-gray-200"
+                    >
+                        Get Started <ArrowRight className="ml-2 h-5 w-5" />
+                    </Button>
+                </div>
+            </section>
 
-            <motion.div
-                className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-            >
-                <Card className="bg-gradient-to-r from-indigo-500 to-blue-500 text-white p-6">
-                    <h3 className="text-lg font-bold">
-                        Weekly Contributed Transactions
-                    </h3>
-                    <p className="mt-2 text-xl">120 SOL</p>
-                    <div className="flex items-center justify-between mt-4">
-                        <p>20% of platform total</p>
-                        <Button
-                            variant="outline"
-                            className="text-white border-white"
-                        >
-                            <Link href={"/v1/dashboard"}>Send More</Link>
-                        </Button>
+            {/* Features Section */}
+            <section className="py-20 bg-gray-50">
+                <div className="container mx-auto px-4">
+                    <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+                        Why Choose Our Platform?
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <Card className="bg-white">
+                            <CardHeader>
+                                <Zap className="h-10 w-10 text-black mb-4" />
+                                <CardTitle>Lightning Fast</CardTitle>
+                                <CardDescription>
+                                    Process hundreds of transactions in seconds
+                                </CardDescription>
+                            </CardHeader>
+                        </Card>
+                        <Card className="bg-white">
+                            <CardHeader>
+                                <Shield className="h-10 w-10 text-black mb-4" />
+                                <CardTitle>Secure & Reliable</CardTitle>
+                                <CardDescription>
+                                    Bank-grade encryption for all your
+                                    transactions
+                                </CardDescription>
+                            </CardHeader>
+                        </Card>
+                        <Card className="bg-white">
+                            <CardHeader>
+                                <Send className="h-10 w-10 text-black mb-4" />
+                                <CardTitle>Easy to Use</CardTitle>
+                                <CardDescription>
+                                    Intuitive interface for seamless bulk
+                                    sending
+                                </CardDescription>
+                            </CardHeader>
+                        </Card>
                     </div>
-                </Card>
+                </div>
+            </section>
 
-                <Card className="bg-gradient-to-r from-green-500 to-teal-500 text-white p-6">
-                    <h3 className="text-lg font-bold">
-                        Daily Contributed Transactions
-                    </h3>
-                    <p className="mt-2 text-xl">30 SOL</p>
-                    <div className="flex items-center justify-between mt-4">
-                        <p>5% of platform total</p>
-                        <Button
-                            variant="outline"
-                            className="text-white border-white"
-                        >
-                            <Link href={"/v1/dashboard"}>Send More</Link>{" "}
-                        </Button>
+            {/* Video Section */}
+            <section className="py-20 bg-black text-white">
+                <div className="container mx-auto px-4">
+                    <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+                        See Our Platform in Action
+                    </h2>
+                    <div className="aspect-w-16 aspect-h-9 max-w-4xl mx-auto">
+                        <iframe
+                            className="w-full h-full"
+                            src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                            title="Product Demo"
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                        ></iframe>
                     </div>
-                </Card>
-            </motion.div>
+                </div>
+            </section>
+
+            {/* How It Works Section */}
+            <section className="py-20 bg-white">
+                <div className="container mx-auto px-4">
+                    <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+                        How It Works
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {[
+                            {
+                                step: 1,
+                                title: "Upload Addresses",
+                                description:
+                                    "Import your list of wallet addresses",
+                            },
+                            {
+                                step: 2,
+                                title: "Set Amount",
+                                description:
+                                    "Specify the amount for each transaction",
+                            },
+                            {
+                                step: 3,
+                                title: "Send",
+                                description:
+                                    "Click once to send all transactions",
+                            },
+                        ].map((item) => (
+                            <Card key={item.step} className="bg-gray-50">
+                                <CardHeader>
+                                    <div className="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center mb-4">
+                                        {item.step}
+                                    </div>
+                                    <CardTitle>{item.title}</CardTitle>
+                                    <CardDescription>
+                                        {item.description}
+                                    </CardDescription>
+                                </CardHeader>
+                            </Card>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* CTA Section */}
+            <section className="py-20 bg-black text-white">
+                <div className="container mx-auto px-4 text-center">
+                    <h2 className="text-3xl md:text-4xl font-bold mb-6">
+                        Ready to Streamline Your Transactions?
+                    </h2>
+                    <p className="text-xl mb-8 max-w-2xl mx-auto">
+                        Join thousands of users who are saving time and reducing
+                        errors with our bulk transaction platform.
+                    </p>
+                    <Button
+                        size="lg"
+                        className="bg-white text-black hover:bg-gray-200"
+                    >
+                        Start Your Free Trial{" "}
+                        <ArrowRight className="ml-2 h-5 w-5" />
+                    </Button>
+                </div>
+            </section>
+
+            {/* Footer */}
+            <footer className="py-10 bg-gray-100">
+                <div className="container mx-auto px-4 text-center">
+                    <p>
+                        &copy; 2023 Bulk Transaction Platform. All rights
+                        reserved.
+                    </p>
+                </div>
+            </footer>
         </div>
     );
-};
-
-export default Dashboard;
+}
