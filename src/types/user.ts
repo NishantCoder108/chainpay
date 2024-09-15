@@ -27,3 +27,10 @@ export interface IRecipient {
     walletAddress: string;
     country: string;
 }
+
+export interface IFilters {
+    search: string;
+    country?: string;
+    startDate?: Date | null;
+    endDate?: Date | null;
+}
