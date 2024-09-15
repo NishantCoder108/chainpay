@@ -13,15 +13,14 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import {
-    WalletIcon,
     LayoutDashboardIcon,
     SendIcon,
     HistoryIcon,
-    CreditCardIcon,
     LogOutIcon,
     ChevronLeftIcon,
     ChevronRightIcon,
     Link as Chain,
+    ScrollText,
 } from "lucide-react";
 import ConnectWallet from "./wallets/ConnectWallet";
 import { signOut } from "next-auth/react";
@@ -35,7 +34,7 @@ const navItems = [
         path: "/v1/transaction-history",
     },
     {
-        icon: CreditCardIcon,
+        icon: ScrollText,
         label: "Billing",
         path: "/v1/billing",
         subPaths: [
@@ -49,9 +48,6 @@ const navItems = [
 ];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-    const [isWalletConnected, setIsWalletConnected] = useState(false);
-    const [walletBalance, setWalletBalance] = useState(0);
-    const [walletAddress, setWalletAddress] = useState("");
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
     const [network, setNetwork] = useState("devnet");
 
@@ -62,14 +58,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     };
 
     const getNavLabel = (pathname: string) => {
-        // First, check if the main path matches exactly
         const mainItem = navItems.find((item) => item.path === pathname);
 
         if (mainItem) {
             return mainItem.label;
         }
 
-        // If no main path match, check if any subPath matches
         for (const item of navItems) {
             if (item.subPaths) {
                 const subItem = item.subPaths.find((subPath) =>
@@ -81,7 +75,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             }
         }
 
-        // Default fallback label if no match is found
         return "Dashboard";
     };
 
@@ -91,11 +84,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         };
 
         handleResize();
-
         window.addEventListener("resize", handleResize);
 
         return () => window.removeEventListener("resize", handleResize);
     }, []);
+
     return (
         <div className="flex h-screen bg-gray-100  dark:bg-gray-900">
             {/* Sidebar */}
@@ -195,8 +188,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 <header className="bg-white  shadow-md">
                     <div className="flex justify-between  items-center p-4">
                         <h2 className="text-lg font-bold text-gray-800 ">
-                            {/* {navItems.find((item) => item.path === pathname)
-                                ?.label || "Dashboard"} */}
                             {getNavLabel(pathname)}
                         </h2>
                         <div className="flex items-center space-x-4">
@@ -253,7 +244,7 @@ function NavItem({
                             </motion.span>
                         )}
                     </AnimatePresence>
-                </div>{" "}
+                </div>
             </Link>
         </motion.span>
     );
