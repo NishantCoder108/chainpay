@@ -1,24 +1,25 @@
+"use client";
 import { useEffect, useState } from "react";
 
 export default function LoadingScreen() {
     const [progress, setProgress] = useState(0);
 
-    useEffect(() => {
-        const timer = setInterval(() => {
-            setProgress((oldProgress) => {
-                if (oldProgress === 100) {
-                    clearInterval(timer);
-                    return 100;
-                }
-                const newProgress = oldProgress + 10;
-                return Math.min(newProgress, 100);
-            });
-        }, 200);
+    // useEffect(() => {
+    //     const timer = setInterval(() => {
+    //         setProgress((oldProgress) => {
+    //             if (oldProgress === 100) {
+    //                 clearInterval(timer);
+    //                 return 100;
+    //             }
+    //             const newProgress = oldProgress + 10;
+    //             return Math.min(newProgress, 100);
+    //         });
+    //     }, 200);
 
-        return () => {
-            clearInterval(timer);
-        };
-    }, []);
+    //     return () => {
+    //         clearInterval(timer);
+    //     };
+    // }, []);
 
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black">
@@ -44,17 +45,17 @@ export default function LoadingScreen() {
                 <h2 className="text-4xl font-bold text-white mb-6">
                     Loading your experience
                 </h2>
-                <div className="w-64 h-1 bg-gray-800 rounded-full mx-auto overflow-hidden">
+                {/* <div className="w-64 h-1 bg-gray-800 rounded-full mx-auto overflow-hidden">
                     <div
                         className="h-full bg-white rounded-full transition-all duration-500 ease-out"
                         style={{ width: `${progress}%` }}
                     />
-                </div>
-                <p className="text-gray-500 mt-4 font-mono">
+                </div> */}
+                {/* <p className="text-gray-500 mt-4 font-mono">
                     {progress}% Complete
-                </p>
+                </p> */}
             </div>
-            <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-gray-900 via-gray-500 to-white" />
+            {/* <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-gray-900 via-gray-500 to-white" /> */}
         </div>
     );
 }

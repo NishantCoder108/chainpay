@@ -19,60 +19,27 @@ import {
     Copy,
 } from "lucide-react";
 import CopyToClipboard from "./common/CopyToClipboard";
-import { formattedLongString } from "@/lib/utils";
+import { containerVariants, formattedLongString } from "@/lib/utils";
+import { IUserDashboardDetails } from "@/types/user";
 
-const recentTransactions = [
-    {
-        id: 1,
-        name: "Alice Johnson",
-        email: "alice@example.com",
-        walletAddress: "JC2CLARmXhNWPkKr1tsfwiJngMj3z4biqj4M5AnH56p3",
-        amount: 1.5,
-        signature: "tx123...abc",
-    },
-    {
-        id: 2,
-        name: "Bob Smith",
-        email: "bob@example.com",
-        walletAddress: "7yK2...m3Z8",
-        amount: 2.0,
-        signature: "tx456...def",
-    },
-    {
-        id: 3,
-        name: "Charlie Brown",
-        email: "charlie@example.com",
-        walletAddress: "9wR5...b6Y4",
-        amount: 1.0,
-        signature: "tx789...ghi",
-    },
-    {
-        id: 4,
-        name: "Diana Prince",
-        email: "diana@example.com",
-        walletAddress: "3zM8...k7L2",
-        amount: 3.5,
-        signature: "tx012...jkl",
-    },
-];
+interface IProps {
+    dataError: string;
+    dashboardDetails: IUserDashboardDetails;
+}
 
-export default function ChainpayDashboard() {
-    const [totalTransactions, setTotalTransactions] = useState(1234);
-    const [totalUsers, setTotalUsers] = useState(567);
+export default function ChainpayDashboard({
+    dashboardDetails,
+    dataError,
+}: IProps) {
+    const {
+        incrementByMonth,
+        incrementByWeek,
+        latestTransactions,
+        totalTransactions,
+        totalUsers,
+    } = dashboardDetails;
 
-    const containerVariants = {
-        hidden: { opacity: 0, y: -50 },
-        visible: {
-            opacity: 1,
-            y: 0,
-            transition: {
-                type: "spring",
-                stiffness: 100,
-                damping: 15,
-                staggerChildren: 0.1,
-            },
-        },
-    };
+    console.log({ dataError });
     return (
         <motion.div
             variants={containerVariants}
@@ -103,10 +70,10 @@ export default function ChainpayDashboard() {
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">
-                            {totalTransactions.toLocaleString()}
+                            {totalTransactions}
                         </div>
                         <p className="text-xs text-muted-foreground">
-                            +20.1% from last month
+                            {incrementByMonth}
                         </p>
                     </CardContent>
                 </Card>
@@ -118,11 +85,9 @@ export default function ChainpayDashboard() {
                         <UsersIcon className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">
-                            {totalUsers.toLocaleString()}
-                        </div>
+                        <div className="text-2xl font-bold">{totalUsers}</div>
                         <p className="text-xs text-muted-foreground">
-                            +180 new users this week
+                            {incrementByWeek}
                         </p>
                     </CardContent>
                 </Card>
@@ -157,7 +122,7 @@ export default function ChainpayDashboard() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {recentTransactions.map((tx) => (
+                                {latestTransactions?.map((tx) => (
                                     <TableRow key={tx.id}>
                                         <TableCell className="font-medium ">
                                             {tx.name}
