@@ -1,7 +1,14 @@
-import NextAuth from "next-auth";
+import { AdminUser } from "@/models/user";
+import NextAuth, { DefaultSession } from "next-auth";
 import Google from "next-auth/providers/google";
-import User from "@/models/user";
 
+declare module "next-auth" {
+    interface Session {
+        user: {
+            userId: string;
+        } & DefaultSession["user"];
+    }
+}
 export const { handlers, signIn, signOut, auth } = NextAuth({
     providers: [Google],
     callbacks: {
@@ -12,13 +19,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             }
             try {
                 const { email, name } = params.user;
-                const existingUser = await User.findOne({ email });
+                const existingUser = await AdminUser.findOne({ email });
 
                 if (existingUser) {
                     return true;
                 }
 
-                const newUser = new User({
+                const newUser = new AdminUser({
                     name,
                     email,
                     provider: "Google",
@@ -35,7 +42,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         },
 
         async session({ session }) {
-            const dbUser = await User.findOne({ email: session.user.email });
+            const dbUser = await AdminUser.findOne({
+                email: session.user.email,
+            });
             console.log({ dbUser });
             if (!dbUser) {
                 return session;
@@ -44,7 +53,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 ...session,
                 user: {
                     ...session.user,
-                    id: dbUser._id,
+                    userId: dbUser._id,
                 },
             };
         },
