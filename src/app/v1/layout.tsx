@@ -15,7 +15,7 @@ const Homepage = ({ children }: { children: React.ReactNode }) => {
     const router = useRouter();
 
     const endpoint = process.env.NEXT_PUBLIC_RPC_URL as string;
-    console.log({ endpoint });
+    console.log({ session });
     const [hasMounted, setHasMounted] = useState(false);
 
     useEffect(() => {
