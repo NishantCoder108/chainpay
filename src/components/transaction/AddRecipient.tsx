@@ -37,14 +37,19 @@ const AddRecipient = ({ setIsAddUserDialogOpen }: IProps) => {
     const handleAddUser = async () => {
         try {
             const recipient = {
-                name: newUser.name,
-                email: newUser.email,
-                walletAddress: newUser.walletAddress,
-                country: newUser.country,
-                userId: session?.user.userId,
+                name: newUser.name.trim(),
+                email: newUser.email.trim(),
+                walletAddress: newUser.walletAddress.trim(),
+                country: newUser.country.trim(),
+                userId: session?.user.userId.trim(),
             };
             console.log({ newUser });
 
+            const { name, email, walletAddress, country, userId } = recipient;
+
+            if (!name || !email || !walletAddress || !country || !userId) {
+                throw new Error("All required fields must be filled.");
+            }
             const response = await fetch("/api/v1/addRecipient", {
                 method: "POST",
                 headers: {
@@ -97,7 +102,7 @@ const AddRecipient = ({ setIsAddUserDialogOpen }: IProps) => {
                 <div className="grid gap-4 py-4">
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="name" className="text-right">
-                            Name
+                            Name*
                         </Label>
                         <Input
                             id="name"
@@ -114,7 +119,7 @@ const AddRecipient = ({ setIsAddUserDialogOpen }: IProps) => {
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="email" className="text-right">
-                            Email
+                            Email*
                         </Label>
                         <Input
                             id="email"
@@ -131,7 +136,7 @@ const AddRecipient = ({ setIsAddUserDialogOpen }: IProps) => {
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="walletAddress" className="text-right">
-                            Wallet Address
+                            Wallet Address*
                         </Label>
                         <Input
                             id="walletAddress"
@@ -148,7 +153,7 @@ const AddRecipient = ({ setIsAddUserDialogOpen }: IProps) => {
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="country" className="text-right">
-                            Country
+                            Country*
                         </Label>
                         <Select
                             value={newUser.country}
