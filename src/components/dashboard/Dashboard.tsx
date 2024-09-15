@@ -1,24 +1,21 @@
-import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import {
     Card,
-    CardContent,
     CardDescription,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { ArrowRight, CheckCircle, Send, Shield, Zap } from "lucide-react";
+import { ArrowRight, Send, Shield, Zap } from "lucide-react";
 import { handleSignIn } from "@/app/actions/dashboardAction";
 
 export default function HomePage() {
     return (
         <div className="min-h-screen bg-white text-black">
-            {/* Hero Section */}
             <section className="relative h-screen flex items-center justify-center bg-black text-white overflow-hidden">
                 <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-10"></div>
                 <div className="container mx-auto px-4 z-10 text-center">
                     <h1 className="text-4xl md:text-6xl font-bold mb-6">
-                        Bulk Transactions Made Simple
+                        Bulk Transactions Reimagined
                     </h1>
                     <p className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto">
                         Send multiple transactions to different wallet addresses
@@ -103,9 +100,9 @@ export default function HomePage() {
                         {[
                             {
                                 step: 1,
-                                title: "Upload Addresses",
+                                title: "Add Addresses",
                                 description:
-                                    "Import your list of wallet addresses",
+                                    "Add your list of wallet addresses",
                             },
                             {
                                 step: 2,
@@ -159,10 +156,7 @@ export default function HomePage() {
             {/* Footer */}
             <footer className="py-10 bg-gray-100">
                 <div className="container mx-auto px-4 text-center">
-                    <p>
-                        &copy; 2023 Bulk Transaction Platform. All rights
-                        reserved.
-                    </p>
+                    <p>&copy; 2024 ChainPay. All rights reserved.</p>
                 </div>
             </footer>
         </div>
