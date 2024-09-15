@@ -2,7 +2,7 @@ import { isValidSolanaAddress } from "@/lib/wallet/verifyWalletAddress";
 import { AdminUser, Recipient } from "@/models/user";
 import { IRecipient } from "@/types/user";
 import { isObjectIdOrHexString, Mongoose } from "mongoose";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: Request) {
     try {
@@ -52,6 +52,34 @@ export async function POST(req: Request) {
     }
 }
 
+export async function GET(req: NextRequest) {
+    try {
+        const searchParams = req.nextUrl.searchParams;
+        const userId = searchParams.get("userId");
+        if (!userId) {
+            throw new Error("User Id is not found");
+        }
+
+        const allUsers = await AdminUser.findById({ _id: userId })
+            .populate("recipients")
+            .exec();
+
+        if (!allUsers) {
+            throw new Error(`User not found by ${userId}`);
+        }
+
+        return NextResponse.json(
+            {
+                data: allUsers.recipients,
+            },
+            { status: 200 }
+        );
+    } catch (error) {
+        const err = (error as Error).message;
+        console.log({ error });
+        return NextResponse.json({ error: err }, { status: 500 });
+    }
+}
 // return new Response("Something Success Testing", {
 //     status: 200,
 
