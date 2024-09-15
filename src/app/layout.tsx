@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import SessionWrapper from "@/components/common/SessionProvider";
+import { Toaster } from "@/components/ui/sonner";
 
 const robotoRegular = localFont({
     src: "./fonts/Roboto-Regular.ttf",
@@ -22,6 +23,7 @@ export default function RootLayout({
             <html lang="en">
                 <body className={`${robotoRegular.className} antialiased`}>
                     {children}
+                    <Toaster className="z-50" />
                 </body>
             </html>
         </SessionWrapper>
