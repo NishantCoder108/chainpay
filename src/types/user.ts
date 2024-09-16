@@ -34,3 +34,12 @@ export interface IFilters {
     startDate?: Date | null;
     endDate?: Date | null;
 }
+
+export interface IUser {
+    _id: string;
+    name: string;
+    email: string;
+    walletAddress: string;
+    country: string;
+    createdAt: string;
+}
