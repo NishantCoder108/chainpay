@@ -36,14 +36,14 @@ const users = [
     {
         id: 1,
         name: "Alice",
-        walletAddress: "4xLjCB5GgT6FhyshwG3ARFYMPk2oH2aMP2eDEqUhEhqx",
+        walletAddress: "4xLjCB5GgT6FhyshwG3ARFYMPaMP2eDEqUhEhqx",
         email: "alice@example.com",
         country: "USA",
     },
     {
         id: 2,
         name: "Bob",
-        walletAddress: "2uKCWNYJvBijL76a4f4xfUY1y4p9e6ZLyqnyBq68CTAy",
+        walletAddress: "2uKCWNYJvBijL76a4f4xe6ZLyqnyBq68CTAy",
         email: "bob@example.com",
         country: "Canada",
     },
