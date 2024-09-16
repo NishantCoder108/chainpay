@@ -13,16 +13,7 @@ import {
 import { countries } from "@/lib/countryList";
 import { Input } from "../ui/input";
 import { format } from "date-fns";
-import { IFilters } from "@/types/user";
-
-interface IUser {
-    id: number;
-    name: string;
-    email: string;
-    walletAddress: string;
-    country: string;
-    createdAt: string;
-}
+import { IFilters, IUser } from "@/types/user";
 
 interface IProps {
     users: IUser[];
