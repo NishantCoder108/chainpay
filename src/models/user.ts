@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { Schema } from "mongoose";
+import { Transactions } from "./transaction";
 
 const RecipientSchema = new mongoose.Schema(
     {
@@ -57,7 +58,7 @@ const AdminUserSchema = new mongoose.Schema(
         transactions: [
             {
                 type: mongoose.Schema.Types.ObjectId,
-                ref: "Transaction",
+                ref: Transactions,
             },
         ],
         walletAddress: {

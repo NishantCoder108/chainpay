@@ -67,6 +67,7 @@ export async function GET(req: NextRequest) {
             .populate("transactions")
             .exec();
 
+        console.log("Get Admin User :", adminUser);
         if (!adminUser) {
             throw new Error(`AdminUser not found`);
         }
