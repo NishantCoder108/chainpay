@@ -54,7 +54,12 @@ const AdminUserSchema = new mongoose.Schema(
                 ref: Recipient,
             },
         ],
-        transactions: [],
+        transactions: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Transaction",
+            },
+        ],
         walletAddress: {
             type: String,
         },
