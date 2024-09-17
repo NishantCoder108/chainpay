@@ -9,6 +9,7 @@ import "@solana/wallet-adapter-react-ui/styles.css";
 import LoadingScreen from "@/components/common/LoadingUi";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { BalanceProvider } from "@/contexts/BalanceContext";
 
 const Homepage = ({ children }: { children: React.ReactNode }) => {
     const { data: session } = useSession();
@@ -33,7 +34,9 @@ const Homepage = ({ children }: { children: React.ReactNode }) => {
         return (
             <ConnectionProvider endpoint={endpoint}>
                 <WalletProvider wallets={[]} autoConnect>
-                    <AppLayout>{children}</AppLayout>
+                    <BalanceProvider>
+                        <AppLayout>{children}</AppLayout>
+                    </BalanceProvider>
                 </WalletProvider>
             </ConnectionProvider>
         );

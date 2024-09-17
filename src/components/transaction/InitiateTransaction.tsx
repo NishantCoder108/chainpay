@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import {
     Dialog,
     DialogContent,
@@ -23,11 +23,12 @@ import {
     TableRow,
 } from "../ui/table";
 import { IUser } from "@/types/user";
-import { getBalance } from "@/lib/wallet/getBalance";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { toast } from "sonner";
 import { generateBatchTransaction } from "@/lib/wallet/generateBatchedTranasactions";
-import { PublicKey, Transaction } from "@solana/web3.js";
+import { Transaction } from "@solana/web3.js";
+import { useSession } from "next-auth/react";
+import { BalanceContext } from "@/contexts/BalanceContext";
 
 interface IProps {
     selectedUsers: IUser[];
@@ -42,16 +43,15 @@ const InitiateTransaction = ({
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [solAmount, setSolAmount] = useState<number>(0);
     const [isSending, setIsSending] = useState(false);
-    const [walletSolBal, setWalletSolBal] = useState<number>(0);
-    const [transactionResLists, setTransactionResLists] = useState([]);
 
-    const {
-        connected: walletConnected,
-        publicKey,
-        sendTransaction,
-    } = useWallet();
+    const { data: session } = useSession();
+    const { publicKey, sendTransaction } = useWallet();
     const { connection } = useConnection();
+    const balanceContext = useContext(BalanceContext);
 
+    const { walletBalance, updateBalance } = balanceContext;
+
+    console.log({ walletBalance });
     const executeBatchTransaction = async (transactionList: Transaction[]) => {
         const results: string[] = [];
         for (let index = 0; index < transactionList.length; index++) {
@@ -75,7 +75,44 @@ const InitiateTransaction = ({
                     "processed"
                 );
                 console.log({ confirmTransc });
-                alert("Successful Transaction!");
+
+                // Saving Data at db
+
+                const amount = 10;
+                const startIndex = index * amount;
+
+                const limitedUsers = selectedUsers.slice(
+                    startIndex,
+                    startIndex + amount
+                );
+
+                const newTransaction = {
+                    name: limitedUsers.map((user) => user.name.trim()),
+                    email: limitedUsers.map((user) => user.email.trim()),
+                    walletAddress: limitedUsers.map((user) =>
+                        user.walletAddress.trim()
+                    ),
+                    country: limitedUsers.map((user) => user.country.trim()),
+                    amount,
+                    signature,
+                    userId: session?.user.userId.trim(),
+                };
+
+                console.log(newTransaction);
+
+                const response = await fetch("/api/v1/transaction", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(newTransaction),
+                });
+
+                console.log("Transaction Res", response);
+                if (!response.ok && response.status === 201) {
+                    const resError = await response.json();
+                    throw resError;
+                }
 
                 results.push(`Batch ${index + 1} confirmed: ${signature}`);
             } catch (error) {
@@ -108,6 +145,7 @@ const InitiateTransaction = ({
                 await executeBatchTransaction(transactionList);
                 console.log({ transactionList });
 
+                updateBalance();
                 setIsModalOpen(false);
                 setSolAmount(0);
                 setSelectedUsers([]);
@@ -131,28 +169,8 @@ const InitiateTransaction = ({
     };
 
     const isBalanceSufficient = () => {
-        return calculateTotalAmount() <= walletSolBal;
+        return calculateTotalAmount() <= walletBalance;
     };
-
-    const fetchSolBal = async () => {
-        const walletPublicKey = publicKey;
-
-        try {
-            if (!walletPublicKey) throw new Error("No Wallet Public Key");
-
-            const bal = await getBalance(walletPublicKey);
-
-            console.log("Account Sol Balance:", bal);
-            setWalletSolBal(Number(bal));
-        } catch (error) {
-            console.log("setWalletSolBal", error);
-            setWalletSolBal(0);
-        }
-    };
-
-    useEffect(() => {
-        fetchSolBal();
-    }, [walletConnected]);
     return (
         <div>
             <motion.div variants={itemVariants} className="flex justify-end">
@@ -207,7 +225,7 @@ const InitiateTransaction = ({
                                         <span className="font-semibold">
                                             {(
                                                 calculateTotalAmount() -
-                                                walletSolBal
+                                                walletBalance
                                             ).toPrecision(5)}
                                         </span>{" "}
                                         more SOL.
