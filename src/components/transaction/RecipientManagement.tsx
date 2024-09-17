@@ -27,7 +27,6 @@ import InitiateTransaction from "./InitiateTransaction";
 export default function RecipientManagement() {
     const [users, setUsers] = useState<IUser[]>([]);
     const [selectedUsers, setSelectedUsers] = useState<IUser[]>([]);
-    const [walletBalance, setWalletBalance] = useState(10);
     const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
     const { data: session } = useSession();
 
@@ -75,27 +74,6 @@ export default function RecipientManagement() {
                 : [...prev, ...filterUserList]
         );
     };
-
-    // const handleAddUser = () => {
-    //     const newUserId = users.length + 1;
-    //     setUsers([
-    //         ...users,
-    //         {
-    //             id: newUserId,
-    //             ...newUser,
-
-    //             // addedAt: new Date()
-    //         },
-    //     ]);
-    //     setNewUser({
-    //         name: "",
-    //         email: "",
-    //         walletAddress: "",
-    //         country: "",
-    //         addedAt: new Date(),
-    //     });
-    //     setIsAddUserDialogOpen(false);
-    // };
 
     const fetchData = async () => {
         setLoadingTable(true);
