@@ -17,10 +17,16 @@ import {
     SendIcon,
     ExternalLinkIcon,
     Copy,
+    ChevronRightIcon,
 } from "lucide-react";
 import CopyToClipboard from "./common/CopyToClipboard";
 import { containerVariants, formattedLongString } from "@/lib/utils";
 import { IUserDashboardDetails } from "@/types/user";
+import { formatDate } from "date-fns";
+import { Badge } from "./ui/badge";
+import TableLoader from "./common/TableLoader";
+import { Skeleton } from "./ui/skeleton";
+import { ScrollArea } from "./ui/scroll-area";
 
 interface IProps {
     dataError: string;
@@ -70,10 +76,14 @@ export default function ChainpayDashboard({
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">
-                            {totalTransactions}
+                            {totalTransactions || 0}
                         </div>
                         <p className="text-xs text-muted-foreground">
-                            {incrementByMonth}
+                            {!incrementByMonth ? (
+                                <Skeleton className="h-5 w-full my-2 rounded-md" />
+                            ) : (
+                                incrementByMonth
+                            )}{" "}
                         </p>
                     </CardContent>
                 </Card>
@@ -85,9 +95,15 @@ export default function ChainpayDashboard({
                         <UsersIcon className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{totalUsers}</div>
+                        <div className="text-2xl font-bold">
+                            {totalUsers || 0}
+                        </div>
                         <p className="text-xs text-muted-foreground">
-                            {incrementByWeek}
+                            {!incrementByWeek ? (
+                                <Skeleton className="h-5 w-full my-2 rounded-md" />
+                            ) : (
+                                incrementByWeek
+                            )}
                         </p>
                     </CardContent>
                 </Card>
@@ -107,71 +123,162 @@ export default function ChainpayDashboard({
                     </CardContent>
                 </Card>
             </div>
-            <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
-                <div className="p-6">
-                    <h3 className="text-lg font-medium">Recent Transactions</h3>
-                    <div className="mt-4">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Name</TableHead>
-                                    <TableHead>Email</TableHead>
-                                    <TableHead>Wallet Address</TableHead>
-                                    <TableHead>Amount (SOL)</TableHead>
-                                    <TableHead>Signature</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {latestTransactions?.map((tx) => (
-                                    <TableRow key={tx.id}>
-                                        <TableCell className="font-medium ">
-                                            {tx.name}
-                                        </TableCell>
-                                        <TableCell>{tx.email}</TableCell>
-                                        <TableCell>
-                                            <div className="flex items-center gap-2   justify-start">
-                                                {formattedLongString(
-                                                    tx.walletAddress
-                                                )}
-                                                <CopyToClipboard
-                                                    textToCopy={
-                                                        tx.walletAddress
-                                                    }
-                                                />
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>{tx.amount}</TableCell>
-                                        <TableCell>
-                                            <Link
-                                                href={`https://explorer.solana.com/tx/${tx.signature}`}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="flex items-center gap-1 text-blue-500 hover:text-blue-700"
-                                            >
-                                                {formattedLongString(
-                                                    tx.signature
-                                                )}
-                                                <ExternalLinkIcon size={12} />
-                                            </Link>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </div>
-                    <div className="mt-4 flex justify-end">
-                        <Link href="/v1/transaction-history">
-                            <Button
-                                variant="outline"
-                                className="flex items-center"
-                            >
-                                Show More
-                                <ArrowRightIcon className="ml-2 h-4 w-4" />
-                            </Button>
-                        </Link>
+
+            <motion.div
+                className="space-y-4 text-black"
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+            >
+                <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
+                    <div className="p-6">
+                        <h3 className="text-lg font-medium">
+                            Recent Transactions
+                        </h3>
+                        <div className="mt-4">
+                            <Table>
+                                <ScrollArea className="h-[54vh]">
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>S.No</TableHead>
+                                            <TableHead>Name</TableHead>
+                                            <TableHead>Email</TableHead>
+                                            <TableHead className="">
+                                                Wallet Address
+                                            </TableHead>
+                                            <TableHead className=" flex text-nowrap items-center">
+                                                Amount (SOL)
+                                            </TableHead>
+                                            <TableHead>CreatedAt</TableHead>
+                                            <TableHead>Signature</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+
+                                    <TableBody>
+                                        {!latestTransactions ? (
+                                            <TableLoader />
+                                        ) : latestTransactions.length !== 0 ? (
+                                            latestTransactions.map((tx, i) => (
+                                                <TableRow key={tx._id}>
+                                                    <TableCell>
+                                                        {i + 1}{" "}
+                                                    </TableCell>
+                                                    <TableCell className="font-medium ">
+                                                        {tx.name.map(
+                                                            (nameItem) => (
+                                                                <Badge
+                                                                    variant={
+                                                                        "secondary"
+                                                                    }
+                                                                    key={
+                                                                        nameItem
+                                                                    }
+                                                                >
+                                                                    {nameItem}
+                                                                </Badge>
+                                                            )
+                                                        )}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {tx.email.map(
+                                                            (emailItem) => (
+                                                                <Badge
+                                                                    variant={
+                                                                        "secondary"
+                                                                    }
+                                                                    key={
+                                                                        emailItem
+                                                                    }
+                                                                >
+                                                                    {emailItem}
+                                                                </Badge>
+                                                            )
+                                                        )}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <div className="flex items-center    justify-start">
+                                                            {tx.walletAddress.map(
+                                                                (
+                                                                    addressItem
+                                                                ) => (
+                                                                    <Badge
+                                                                        variant={
+                                                                            "secondary"
+                                                                        }
+                                                                        key={
+                                                                            addressItem
+                                                                        }
+                                                                    >
+                                                                        <div className="flex gap-1 items-center justify-center relative">
+                                                                            {formattedLongString(
+                                                                                addressItem
+                                                                            )}
+                                                                            <CopyToClipboard
+                                                                                textToCopy={
+                                                                                    addressItem
+                                                                                }
+                                                                            />
+                                                                        </div>
+                                                                    </Badge>
+                                                                )
+                                                            )}
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell className="">
+                                                        {tx.amount}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {formatDate(
+                                                            tx.createdAt,
+                                                            "PPpp"
+                                                        )}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <Link
+                                                            href={`https://explorer.solana.com/tx/${tx.signature}`}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="flex items-center gap-1 text-blue-500 hover:text-blue-700"
+                                                        >
+                                                            {formattedLongString(
+                                                                tx.signature
+                                                            )}
+                                                            <ExternalLinkIcon
+                                                                size={12}
+                                                            />
+                                                        </Link>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <TableCell
+                                                    colSpan={5}
+                                                    className="text-center h-52 text-slate-600"
+                                                >
+                                                    No Recipient Found
+                                                </TableCell>
+                                            </tr>
+                                        )}
+                                    </TableBody>
+                                </ScrollArea>
+                            </Table>
+
+                            <div className="mt-4 flex justify-end">
+                                <Link href="/v1/transaction-history">
+                                    <Button
+                                        variant="outline"
+                                        className="flex items-center"
+                                    >
+                                        Show More
+                                        <ArrowRightIcon className="ml-2 h-4 w-4" />
+                                    </Button>
+                                </Link>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </motion.div>
         </motion.div>
     );
 }
