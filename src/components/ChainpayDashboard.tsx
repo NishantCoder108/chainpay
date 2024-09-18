@@ -157,7 +157,7 @@ export default function ChainpayDashboard({
                                     <TableBody>
                                         {!latestTransactions ? (
                                             <TableLoader />
-                                        ) : latestTransactions.length !== 0 ? (
+                                        ) : latestTransactions.length > 0 ? (
                                             latestTransactions.map((tx, i) => (
                                                 <TableRow key={tx._id}>
                                                     <TableCell>
@@ -253,10 +253,10 @@ export default function ChainpayDashboard({
                                         ) : (
                                             <tr>
                                                 <TableCell
-                                                    colSpan={5}
-                                                    className="text-center h-52 text-slate-600"
+                                                    colSpan={7}
+                                                    className="text-center h-56 items-center text-slate-600"
                                                 >
-                                                    No Recipient Found
+                                                    No Transactions Found
                                                 </TableCell>
                                             </tr>
                                         )}
