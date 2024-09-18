@@ -198,6 +198,7 @@ export default function RecipientManagement() {
                                                                 textToCopy={
                                                                     user.walletAddress
                                                                 }
+                                                                size={12}
                                                             />
                                                         </div>
                                                     </TableCell>
