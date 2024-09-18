@@ -109,7 +109,7 @@ const InitiateTransaction = ({
                 });
 
                 console.log("Transaction Res", response);
-                if (!response.ok && response.status === 201) {
+                if (!response.ok) {
                     const resError = await response.json();
                     throw resError;
                 }
