@@ -10,6 +10,7 @@ import LoadingScreen from "@/components/common/LoadingUi";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { BalanceProvider } from "@/contexts/BalanceContext";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const Homepage = ({ children }: { children: React.ReactNode }) => {
     const { data: session } = useSession();
@@ -35,7 +36,9 @@ const Homepage = ({ children }: { children: React.ReactNode }) => {
             <ConnectionProvider endpoint={endpoint}>
                 <WalletProvider wallets={[]} autoConnect>
                     <BalanceProvider>
-                        <AppLayout>{children}</AppLayout>
+                        <TooltipProvider>
+                            <AppLayout>{children}</AppLayout>
+                        </TooltipProvider>
                     </BalanceProvider>
                 </WalletProvider>
             </ConnectionProvider>
