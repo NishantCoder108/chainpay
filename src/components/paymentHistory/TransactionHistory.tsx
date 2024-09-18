@@ -1,5 +1,6 @@
+"use client";
+
 import { useState, useEffect, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -15,10 +16,8 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
-    DialogFooter,
     DialogTrigger,
 } from "@/components/ui/dialog";
-import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -35,318 +34,253 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
-    UserPlusIcon,
-    XIcon,
-    SendIcon,
-    CalendarIcon,
+    ChevronLeftIcon,
+    ChevronRightIcon,
+    MoreHorizontalIcon,
     SearchIcon,
-    GlobeIcon,
     FilterIcon,
+    ExternalLinkIcon,
+    ArrowRightIcon,
 } from "lucide-react";
-import { format } from "date-fns";
-import Pagination from "../common/Pagination";
-import { containerVariants, itemVariants } from "@/lib/utils";
+import { format, formatDate } from "date-fns";
+import { containerVariants, formattedLongString } from "@/lib/utils";
+import Link from "next/link";
+import CopyToClipboard from "../common/CopyToClipboard";
+import { motion } from "framer-motion";
+import { Badge } from "../ui/badge";
+import TableLoader from "../common/TableLoader";
+import { IFilters, IUserTransaction } from "@/types/user";
+import FilterRecipient from "../transaction/FilterRecipient";
+import FilterTransactions from "./FilterTransactions";
 
-// Mock data for users (in a real app, this would come from a database)
-const initialUsers = [
-    {
-        id: 1,
-        name: "Alice Johnson",
-        email: "alice@example.com",
-        walletAddress: "5xjP...q1X9",
-        country: "USA",
-        addedAt: new Date(2023, 5, 1),
-    },
-    {
-        id: 2,
-        name: "Bob Smith",
-        email: "bob@example.com",
-        walletAddress: "7yK2...m3Z8",
-        country: "Canada",
-        addedAt: new Date(2023, 5, 15),
-    },
-    {
-        id: 3,
-        name: "Charlie Brown",
-        email: "charlie@example.com",
-        walletAddress: "9wR5...b6Y4",
-        country: "UK",
-        addedAt: new Date(2023, 6, 1),
-    },
-    {
-        id: 4,
-        name: "Diana Prince",
-        email: "diana@example.com",
-        walletAddress: "3zM8...k7L2",
-        country: "Australia",
-        addedAt: new Date(2023, 6, 15),
-    },
-    {
-        id: 5,
-        name: "Ethan Hunt",
-        email: "ethan@example.com",
-        walletAddress: "1qA9...j6P5",
-        country: "Germany",
-        addedAt: new Date(2023, 7, 1),
-    },
-];
-
-const countries = [
-    "USA",
-    "Canada",
-    "UK",
-    "Australia",
-    "Germany",
-    "France",
-    "Japan",
-    "Brazil",
-    "India",
-    "South Africa",
-];
-interface IUser {
-    id: number;
-    name: string;
-    email: string;
-    walletAddress: string;
-    country: string;
+interface IProps {
+    transactions: IUserTransaction[];
+    isLoading: boolean;
 }
-
-export default function TransactionHistory() {
-    const [users, setUsers] = useState<IUser[]>(initialUsers);
-    const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [solAmount, setSolAmount] = useState("");
-    const [walletBalance, setWalletBalance] = useState(10); // Mock wallet balance
-    const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
+export default function TransactionHistory({
+    transactions,
+    isLoading,
+}: IProps) {
     const [currentPage, setCurrentPage] = useState(1);
-    const totalPages = 10;
+    const [totalPages, setTotalPages] = useState(1);
 
-    const handlePageChange = (page: number) => {
-        setCurrentPage(page);
-    };
-    const [newUser, setNewUser] = useState({
-        name: "",
-        email: "",
-        walletAddress: "",
-        country: "",
-        addedAt: new Date(),
-    });
-    const [isSending, setIsSending] = useState(false);
-    const [filters, setFilters] = useState({
+    const [filters, setFilters] = useState<IFilters>({
         search: "",
-        country: "",
         startDate: null,
         endDate: null,
     });
 
-    const filteredUsers = useMemo(() => {
-        return users.filter((user) => {
-            const searchLower = filters.search.toLowerCase();
+    const filteredTransactions = useMemo(() => {
+        return transactions.filter((transaction: IUserTransaction) => {
+            const searchLower = filters.search.trim().toLowerCase();
+
             const matchesSearch =
-                user.name.toLowerCase().includes(searchLower) ||
-                user.email.toLowerCase().includes(searchLower) ||
-                user.walletAddress.toLowerCase().includes(searchLower);
-            const matchesCountry =
-                !filters.country || user.country === filters.country;
+                transaction.name.some((nameItem) =>
+                    nameItem.trim().toLowerCase().includes(searchLower)
+                ) ||
+                transaction.email.some((emailItem) =>
+                    emailItem.trim().toLowerCase().includes(searchLower)
+                ) ||
+                transaction.walletAddress.some((walletItem) =>
+                    walletItem.trim().toLowerCase().includes(searchLower)
+                ) ||
+                transaction.signature
+                    .trim()
+                    .toLowerCase()
+                    .includes(searchLower);
+
+            const createdAtDate = new Date(transaction.createdAt);
+
             const matchesDateRange =
-                (!filters.startDate || user.addedAt >= filters.startDate) &&
-                (!filters.endDate || user.addedAt <= filters.endDate);
-            return matchesSearch && matchesCountry && matchesDateRange;
+                (!filters.startDate ||
+                    (filters.startDate instanceof Date &&
+                        createdAtDate >= filters.startDate)) &&
+                (!filters.endDate ||
+                    (filters.endDate instanceof Date &&
+                        createdAtDate <= filters.endDate));
+
+            return matchesSearch && matchesDateRange;
         });
-    }, [users, filters]);
+    }, [transactions, filters]);
 
     return (
         <motion.div
-            className="space-y-6"
+            className="space-y-4 text-black"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
         >
-            <motion.div variants={itemVariants}>
-                <Card>
-                    <CardContent className="pt-6">
-                        <div className="flex flex-col sm:flex-row flex-wrap gap-4 mb-4">
-                            <div className="flex-1 min-w-[200px]">
-                                <div className="relative text-sm">
-                                    <SearchIcon
-                                        size={13}
-                                        className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400"
-                                    />
-                                    <Input
-                                        placeholder="Search by Email, Wallet Address, Name, or Signature"
-                                        value={filters.search}
-                                        onChange={(e) =>
-                                            setFilters({
-                                                ...filters,
-                                                search: e.target.value,
-                                            })
-                                        }
-                                        className="pl-6 w-full text-sm  "
-                                    />
-                                </div>
-                            </div>
-                            <Select
-                                value={filters.country}
-                                onValueChange={(value) =>
-                                    setFilters({ ...filters, country: value })
-                                }
-                            >
-                                <SelectTrigger className="w-full sm:w-[180px]">
-                                    <SelectValue placeholder="Country" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="India">
-                                        All Countries
-                                    </SelectItem>
-                                    {countries.map((country) => (
-                                        <SelectItem
-                                            key={country}
-                                            value={country}
-                                        >
-                                            {country}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                            <Popover>
-                                <PopoverTrigger asChild>
-                                    <Button
-                                        variant="outline"
-                                        className="w-full sm:w-auto justify-start text-left font-normal"
-                                    >
-                                        <CalendarIcon className="mr-2 h-4 w-4" />
-                                        <span className="hidden sm:inline">
-                                            {filters.startDate &&
-                                            filters.endDate ? (
-                                                <>
-                                                    {format(
-                                                        filters.startDate,
-                                                        "PP"
-                                                    )}{" "}
-                                                    -{" "}
-                                                    {format(
-                                                        filters.endDate,
-                                                        "PP"
-                                                    )}
-                                                </>
-                                            ) : (
-                                                <span>Date range</span>
-                                            )}
-                                        </span>
-                                        <span className="sm:hidden">Date</span>
-                                    </Button>
-                                </PopoverTrigger>
-                                <PopoverContent
-                                    className="w-auto p-0"
-                                    align="start"
-                                >
-                                    <Calendar
-                                        mode="range"
-                                        selected={{
-                                            from: filters.startDate,
-                                            to: filters.endDate,
-                                            // from: new Date(),
-                                            // to: new Date(),
-                                        }}
-                                        onSelect={(range) =>
-                                            setFilters({
-                                                ...filters,
-                                                startDate: range?.from || null,
-                                                endDate: range?.to || null,
-                                            })
-                                        }
-                                        initialFocus
-                                    />
-                                </PopoverContent>
-                            </Popover>
-                            <Button
-                                variant="outline"
-                                onClick={() =>
-                                    setFilters({
-                                        search: "",
-                                        country: "",
-                                        startDate: null,
-                                        endDate: null,
-                                    })
-                                }
-                                className="w-full sm:w-auto"
-                            >
-                                <FilterIcon className="mr-2 h-4 w-4" />
-                                <span className="hidden sm:inline">
-                                    Clear Filters
-                                </span>
-                                <span className="sm:hidden">Clear</span>
-                            </Button>
-                        </div>
-
-                        <div className="overflow-x-auto">
-                            <Table>
+            <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
+                <div className="p-6">
+                    <div>
+                        <FilterTransactions
+                            filters={filters}
+                            setFilters={setFilters}
+                        />
+                    </div>
+                    <div className="mt-4">
+                        <Table className="">
+                            <ScrollArea className="min-h-96">
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead className="w-[50px]">
-                                            Select
-                                        </TableHead>
+                                        <TableHead>S.No</TableHead>
                                         <TableHead>Name</TableHead>
-                                        <TableHead className="hidden sm:table-cell">
-                                            Email
+                                        <TableHead>Email</TableHead>
+                                        <TableHead className="">
+                                            Wallet Address
                                         </TableHead>
-                                        <TableHead>Wallet Address</TableHead>
-                                        <TableHead className="hidden md:table-cell">
-                                            Country
+                                        <TableHead className="flex items-center text-nowrap ">
+                                            <span>Amount (SOL)</span>
                                         </TableHead>
+                                        <TableHead>CreatedAt</TableHead>
+                                        <TableHead>Signature</TableHead>
                                     </TableRow>
                                 </TableHeader>
-                                <TableBody>
-                                    <AnimatePresence>
-                                        {filteredUsers.map((user) => (
-                                            <motion.tr
-                                                key={user.id}
-                                                variants={itemVariants}
-                                                initial="hidden"
-                                                animate="visible"
-                                                exit="hidden"
-                                                layout
-                                            >
-                                                <TableCell>
-                                                    <Checkbox
-                                                        checked={selectedUsers.includes(
-                                                            user.id
-                                                        )}
-                                                        onCheckedChange={() =>
-                                                            handleUserSelection(
-                                                                user.id
-                                                            )
-                                                        }
-                                                    />
-                                                </TableCell>
-                                                <TableCell>
-                                                    {user.name}
-                                                </TableCell>
-                                                <TableCell className="hidden sm:table-cell">
-                                                    {user.email}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {user.walletAddress}
-                                                </TableCell>
-                                                <TableCell className="hidden md:table-cell">
-                                                    {user.country}
-                                                </TableCell>
-                                            </motion.tr>
-                                        ))}
-                                    </AnimatePresence>
-                                </TableBody>
-                            </Table>
-                        </div>
-                    </CardContent>
-                </Card>
-            </motion.div>
 
-            <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-            />
+                                <TableBody>
+                                    {filteredTransactions.length > 0 ? (
+                                        filteredTransactions.map((tx, i) => (
+                                            <TableRow key={tx._id}>
+                                                <TableCell>{i + 1} </TableCell>
+                                                <TableCell className="font-medium ">
+                                                    {tx.name.map((nameItem) => (
+                                                        <Badge
+                                                            variant={
+                                                                "secondary"
+                                                            }
+                                                            key={nameItem}
+                                                        >
+                                                            {nameItem}
+                                                        </Badge>
+                                                    ))}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {tx.email.map(
+                                                        (emailItem) => (
+                                                            <Badge
+                                                                variant={
+                                                                    "secondary"
+                                                                }
+                                                                key={emailItem}
+                                                            >
+                                                                {emailItem}
+                                                            </Badge>
+                                                        )
+                                                    )}
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="flex items-center    justify-start">
+                                                        {tx.walletAddress.map(
+                                                            (addressItem) => (
+                                                                <Badge
+                                                                    variant={
+                                                                        "secondary"
+                                                                    }
+                                                                    key={
+                                                                        addressItem
+                                                                    }
+                                                                >
+                                                                    <div className="flex gap-1 items-center justify-center relative">
+                                                                        {formattedLongString(
+                                                                            addressItem
+                                                                        )}
+                                                                        <CopyToClipboard
+                                                                            textToCopy={
+                                                                                addressItem
+                                                                            }
+                                                                        />
+                                                                    </div>
+                                                                </Badge>
+                                                            )
+                                                        )}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="">
+                                                    {tx.amount}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {formatDate(
+                                                        tx.createdAt,
+                                                        "PPpp"
+                                                    )}
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Link
+                                                        href={`https://explorer.solana.com/tx/${tx.signature}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="flex items-center gap-1 text-blue-500 hover:text-blue-700"
+                                                    >
+                                                        {formattedLongString(
+                                                            tx.signature
+                                                        )}
+                                                        <ExternalLinkIcon
+                                                            size={12}
+                                                        />
+                                                    </Link>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            {isLoading ? (
+                                                <TableLoader />
+                                            ) : (
+                                                <TableCell
+                                                    colSpan={7}
+                                                    className="text-center h-56 items-center text-slate-600"
+                                                >
+                                                    No Transactions Found
+                                                </TableCell>
+                                            )}
+                                        </tr>
+                                    )}
+                                </TableBody>
+                            </ScrollArea>
+                        </Table>
+
+                        <div className="flex items-center justify-between pt-6">
+                            <div className="text-sm text-gray-500">
+                                Page {currentPage} of {totalPages}
+                            </div>
+                            <div className="space-x-2 flex items-center">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() =>
+                                        setCurrentPage((prev) =>
+                                            Math.max(prev - 1, 1)
+                                        )
+                                    }
+                                    disabled={currentPage === 1}
+                                >
+                                    <ChevronLeftIcon className="h-4 w-4" />
+                                    Previous
+                                </Button>
+                                <Button
+                                    variant={
+                                        currentPage !== totalPages
+                                            ? "default"
+                                            : "outline"
+                                    }
+                                    size="sm"
+                                    onClick={() =>
+                                        setCurrentPage((prev) =>
+                                            Math.min(prev + 1, totalPages)
+                                        )
+                                    }
+                                    disabled={currentPage === totalPages}
+                                >
+                                    Next
+                                    <ChevronRightIcon className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </motion.div>
     );
 }
