@@ -93,7 +93,7 @@ const InitiateTransaction = ({
                         user.walletAddress.trim()
                     ),
                     country: limitedUsers.map((user) => user.country.trim()),
-                    amount,
+                    amount: solAmount,
                     signature,
                     userId: session?.user.userId.trim(),
                 };
