@@ -6,19 +6,23 @@ export interface User {
     country: string;
 }
 
+export interface IUserTransaction {
+    _id: number | string;
+    name: string[];
+    email: string[];
+    walletAddress: string[];
+    amount: number;
+    signature: string;
+    createdAt: string;
+    country: string[];
+}
+
 export interface IUserDashboardDetails {
     totalUsers: number;
     totalTransactions: number;
     incrementByWeek: string;
     incrementByMonth: string;
-    latestTransactions: {
-        id: number | string;
-        name: string;
-        email: string;
-        walletAddress: string;
-        amount: string;
-        signature: string;
-    }[];
+    latestTransactions: IUserTransaction[];
 }
 
 export interface IRecipient {
