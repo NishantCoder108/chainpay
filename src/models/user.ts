@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { Schema } from "mongoose";
 import { Transactions } from "./transaction";
+import { Plan } from "./billing";
 
 const RecipientSchema = new mongoose.Schema(
     {
@@ -59,6 +60,17 @@ const AdminUserSchema = new mongoose.Schema(
             {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: Transactions,
+            },
+        ],
+        plan: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: Plan,
+            default: null,
+        },
+        billing: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: Plan,
             },
         ],
         walletAddress: {
