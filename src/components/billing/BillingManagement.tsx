@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
     Card,
@@ -38,18 +38,25 @@ import {
     Shield,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import {
+    LAMPORTS_PER_SOL,
+    PublicKey,
+    SystemProgram,
+    Transaction,
+} from "@solana/web3.js";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { BalanceContext } from "@/contexts/BalanceContext";
+import { useSession } from "next-auth/react";
+import { Plan } from "@/app/v1/billing/page";
 
-type Plan = {
-    name: string;
-    price: number;
-    transactions: number;
-    description: string;
-    features: string[];
-    color: string;
-};
+const toPublicAddress = process.env.NEXT_PUBLIC_TO_WALLET_ADDRESS;
 
-const plans: Plan[] = [
-    {
+interface IProps {
+    plans: Plan[];
+    billingData: Plan;
+}
+export default function BillingManagement({ plans, billingData }: IProps) {
+    const [selectedPlan, setSelectedPlan] = useState<Plan>({
         name: "Basic",
         price: 0,
         transactions: 3,
@@ -60,88 +67,97 @@ const plans: Plan[] = [
             "Email support",
         ],
         color: "bg-gray-100",
-    },
-    {
-        name: "Silver",
-        price: 5,
-        transactions: 5,
-        description: "For growing businesses",
-        features: [
-            "Up to 5 bulk transactions",
-            "Advanced analytics",
-            "Priority email support",
-        ],
-        color: "bg-gray-200",
-    },
-    {
-        name: "Gold",
-        price: 10,
-        transactions: 10,
-        description: "For medium-sized enterprises",
-        features: [
-            "Up to 10 bulk transactions",
-            "Premium analytics",
-            "24/7 phone support",
-        ],
-        color: "bg-yellow-100",
-    },
-    {
-        name: "Platinum",
-        price: 50,
-        transactions: 20,
-        description: "For large corporations",
-        features: [
-            "Up to 20 bulk transactions",
-            "Custom analytics",
-            "Dedicated account manager",
-        ],
-        color: "bg-blue-100",
-    },
-];
-
-// Mock user data - set to null for non-subscribed user
-const user = null;
-// Uncomment below for subscribed user
-// const user = {
-//   name: "John Doe",
-//   email: "john.doe@example.com",
-//   walletAddress: "7X3csFvLWbmLhRkuib9bFjDCtYTKD6TGcfepd8NJ8JYx",
-//   currentPlan: plans[1], // Silver plan
-//   subscriptionDate: new Date("2023-05-01"),
-//   transactions: [
-//     { date: "2023-05-15", signature: "5KtPn3MZCrTKBVHbNPx3RexB9QzFtgbpTLqgJTbVrbwZBFzZ7jMHKnhqLNFGZGa6qegDrpiKfJmwEjV7CHsvSGEW" },
-//     { date: "2023-05-20", signature: "2vkPzBdX9Z1XGJ5Q5JZFvYcjf8JnY7z6qX1KZ7QHzBXZBvYcjf8JnY7z6qX1KZ7QHzBXZ" },
-//   ],
-//   usedTransactions: 3
-// }
-
-export default function BillingManagement() {
-    const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
+    });
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
+    const wallet = useWallet();
+    const { connection } = useConnection();
+    const context = useContext(BalanceContext);
+    const { updateBalance } = context;
+    const { data: session } = useSession();
 
     const handleSelectPlan = (plan: Plan) => {
         setSelectedPlan(plan);
         setIsModalOpen(true);
+
+        console.log("Selected Plan", plan);
     };
 
     const handleConfirm = async () => {
         setIsLoading(true);
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        setIsLoading(false);
-        setIsModalOpen(false);
-        router.push("/v1/send-transaction");
+
+        try {
+            if (!wallet.publicKey) throw new Error("Public key is missing");
+            if (!toPublicAddress)
+                throw new Error("To Public Address is not valid.");
+            const transaction = new Transaction().add(
+                SystemProgram.transfer({
+                    fromPubkey: wallet.publicKey as PublicKey,
+                    toPubkey: new PublicKey(toPublicAddress),
+                    lamports: selectedPlan.price * LAMPORTS_PER_SOL,
+                })
+            );
+
+            const { blockhash, lastValidBlockHeight } =
+                await connection.getLatestBlockhash();
+
+            transaction.recentBlockhash = blockhash;
+            transaction.feePayer = wallet.publicKey;
+
+            console.log({ transaction });
+            const signature = await wallet.sendTransaction(
+                transaction,
+                connection
+            );
+
+            console.log({ signature });
+            const confirmTrans = await connection.confirmTransaction(
+                { signature, blockhash, lastValidBlockHeight },
+                "processed"
+            );
+
+            console.log({ confirmTrans });
+
+            // Saving to db
+            const selectedPlanDetails = {
+                userId: session?.user.userId,
+                signature,
+                ...selectedPlan,
+            };
+            const response = await fetch("/api/v1/billing", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(selectedPlanDetails),
+            });
+
+            console.log("Billing Res ", response);
+
+            if (!response.ok) {
+                throw new Error("Saving Plan details in Database failed.");
+            }
+            updateBalance();
+            setIsLoading(false);
+            setIsModalOpen(false);
+            router.push("/v1/send-transaction");
+        } catch (error) {
+            console.log({ error });
+            setIsLoading(false);
+            setIsModalOpen(false);
+        }
     };
 
+    console.log("000Billing Data", billingData);
+    console.log("000Plans Data", plans);
     return (
         <div className="container mx-auto py-10 px-4 sm:px-6 lg:px-8">
             <h1 className="text-4xl font-bold text-center mb-10 text-black">
                 Choose Your Plan
             </h1>
 
-            {user ? (
+            {billingData ? (
                 <div className="mb-12">
                     <Card>
                         <CardHeader>
@@ -156,17 +172,18 @@ export default function BillingManagement() {
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-3xl font-bold">
-                                        {user.currentPlan.name} Plan
+                                        {billingData.name} Plan
                                     </p>
                                     <p className="text-xl text-muted-foreground">
-                                        {user.currentPlan.price} SOL per month
+                                        {billingData.price} SOL per month
                                     </p>
                                 </div>
                                 <CreditCard className="h-12 w-12 text-primary" />
                             </div>
                             <p className="text-sm text-muted-foreground">
                                 Subscribed since:{" "}
-                                {user.subscriptionDate.toLocaleDateString()}
+                                {billingData?.createdAt &&
+                                    billingData?.createdAt}
                             </p>
                         </CardContent>
                         <CardFooter>
@@ -237,7 +254,7 @@ export default function BillingManagement() {
                                     plan.name === "Gold" ? "default" : "outline"
                                 }
                             >
-                                {user && user.currentPlan.name === plan.name
+                                {billingData && billingData.name === plan.name
                                     ? "Current Plan"
                                     : "Select Plan"}
                             </Button>
@@ -246,7 +263,7 @@ export default function BillingManagement() {
                 ))}
             </div>
 
-            {user && (
+            {billingData && (
                 <Card>
                     <CardHeader>
                         <CardTitle className="text-2xl">
@@ -274,7 +291,7 @@ export default function BillingManagement() {
                                                 Name
                                             </p>
                                             <p className="text-lg">
-                                                {user.name}
+                                                {billingData.name}
                                             </p>
                                         </div>
                                         <div>
@@ -282,7 +299,8 @@ export default function BillingManagement() {
                                                 Email
                                             </p>
                                             <p className="text-lg">
-                                                {user.email}
+                                                {/* {billingData.email} */}
+                                                abc@gmailc.ol
                                             </p>
                                         </div>
                                     </div>
@@ -291,7 +309,8 @@ export default function BillingManagement() {
                                             Wallet Address
                                         </p>
                                         <p className="text-lg font-mono">
-                                            {user.walletAddress}
+                                            {/* {user.walletAddress} */}{" "}
+                                            walletAddressqewrt3
                                         </p>
                                     </div>
                                 </div>
@@ -306,11 +325,11 @@ export default function BillingManagement() {
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                            {user.transactions.map(
+                                            {/* {billingData.transactions.map(
                                                 (tx, index) => (
                                                     <TableRow key={index}>
                                                         <TableCell>
-                                                            {tx.date}
+                                                            {tx.createdAt}
                                                         </TableCell>
                                                         <TableCell className="font-mono text-sm">
                                                             {tx.signature.slice(
@@ -324,7 +343,7 @@ export default function BillingManagement() {
                                                         </TableCell>
                                                     </TableRow>
                                                 )
-                                            )}
+                                            )} */}
                                         </TableBody>
                                     </Table>
                                 </div>
@@ -335,7 +354,7 @@ export default function BillingManagement() {
             )}
 
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                <DialogContent className="sm:max-w-[425px]">
+                <DialogContent className="sm:max-w-[425px] bg-slate-50 text-black">
                     <DialogHeader>
                         <DialogTitle>Confirm Plan Selection</DialogTitle>
                         <DialogDescription>
