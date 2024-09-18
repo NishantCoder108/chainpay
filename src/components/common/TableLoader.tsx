@@ -4,11 +4,13 @@ import { TableCell } from "../ui/table";
 
 const TableLoader = () => {
     return (
-        <TableCell colSpan={5} className=" ">
+        <TableCell colSpan={8} className=" ">
             <Skeleton className="h-5 w-full my-2 rounded" />
             <Skeleton className="h-5 w-full my-2 rounded" />
             <Skeleton className="h-5 w-full my-2 rounded" />
             <Skeleton className="h-5 w-full my-2rounded" />
+            <Skeleton className="h-5 w-full my-2 rounded" />
+            <Skeleton className="h-5 w-full my-2 rounded" />
             <Skeleton className="h-5 w-full my-2 rounded" />
         </TableCell>
     );
