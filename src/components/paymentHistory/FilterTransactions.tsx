@@ -1,11 +1,10 @@
-import React, { useMemo, useState } from "react";
 import { Calendar } from "../ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { CalendarIcon, FilterIcon, SearchIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { format } from "date-fns";
-import { IFilters, IUser, IUserTransaction } from "@/types/user";
+import { IFilters, IUserTransaction } from "@/types/user";
 
 interface IProps {
     transactions?: IUserTransaction[];

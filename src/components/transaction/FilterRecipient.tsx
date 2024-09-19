@@ -1,4 +1,3 @@
-import React, { useMemo, useState } from "react";
 import { Calendar } from "../ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { CalendarIcon, FilterIcon, SearchIcon } from "lucide-react";
@@ -21,7 +20,7 @@ interface IProps {
     setFilters: (data: IFilters) => void;
 }
 
-const FilterRecipient = ({ users, setFilters, filters }: IProps) => {
+const FilterRecipient = ({ setFilters, filters }: IProps) => {
     return (
         <div>
             <div className="flex flex-col sm:flex-row flex-wrap gap-4 mb-4">

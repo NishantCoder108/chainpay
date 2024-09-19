@@ -32,11 +32,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
     CheckCircle2,
     Loader2,
-    ArrowRight,
     CreditCard,
-    BarChart,
-    Zap,
-    Shield,
     ExternalLinkIcon,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";

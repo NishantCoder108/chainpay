@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
     Table,
     TableBody,
@@ -11,40 +10,15 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
+
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { Skeleton } from "@/components/ui/skeleton";
+
 import {
     ChevronLeftIcon,
     ChevronRightIcon,
-    MoreHorizontalIcon,
-    SearchIcon,
-    FilterIcon,
     ExternalLinkIcon,
-    ArrowRightIcon,
 } from "lucide-react";
-import { format, formatDate } from "date-fns";
+import { formatDate } from "date-fns";
 import { containerVariants, formattedLongString } from "@/lib/utils";
 import Link from "next/link";
 import CopyToClipboard from "../common/CopyToClipboard";
@@ -52,7 +26,6 @@ import { motion } from "framer-motion";
 import { Badge } from "../ui/badge";
 import TableLoader from "../common/TableLoader";
 import { IFilters, IUserTransaction } from "@/types/user";
-import FilterRecipient from "../transaction/FilterRecipient";
 import FilterTransactions from "./FilterTransactions";
 
 interface IProps {
@@ -64,7 +37,7 @@ export default function TransactionHistory({
     isLoading,
 }: IProps) {
     const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
+    const [totalPages] = useState(1);
 
     const [filters, setFilters] = useState<IFilters>({
         search: "",
