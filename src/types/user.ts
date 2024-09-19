@@ -48,6 +48,17 @@ export interface IUser {
     createdAt: string;
 }
 
+export interface IBillingTransaction {
+    name: string;
+    price: number;
+    transactions: number;
+    description: string;
+    features: string[];
+    color: string;
+    createdAt: string;
+    signature: string;
+}
+
 export interface IBillingPlan {
     planDetails: {
         name: string;
