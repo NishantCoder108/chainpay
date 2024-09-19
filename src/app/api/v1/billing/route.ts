@@ -95,6 +95,7 @@ export async function GET(req: NextRequest) {
         if (!userId) throw new Error("User id is not found");
 
         const userWithPlan = await AdminUser.findById({ _id: userId })
+            .populate("billing")
             .populate("plan")
             .exec();
 
@@ -106,7 +107,8 @@ export async function GET(req: NextRequest) {
                 userDetails: {
                     name: userWithPlan.name,
                     email: userWithPlan.email,
-                    walletAddress: userWithPlan,
+                    walletAddress: userWithPlan.walletAddress,
+                    transactions: userWithPlan.billing,
                 },
             },
             { status: 200 }
