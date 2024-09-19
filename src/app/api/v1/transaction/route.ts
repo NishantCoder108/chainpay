@@ -64,6 +64,7 @@ export async function GET(req: NextRequest) {
         }
 
         const adminUser = await AdminUser.findById({ _id: userId })
+            .populate("plan")
             .populate("transactions")
             .exec();
 
@@ -75,6 +76,7 @@ export async function GET(req: NextRequest) {
         return NextResponse.json(
             {
                 data: adminUser.transactions,
+                plan: adminUser.plan,
             },
             { status: 200 }
         );
