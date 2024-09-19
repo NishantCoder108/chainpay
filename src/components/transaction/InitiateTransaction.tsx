@@ -10,7 +10,7 @@ import {
 import { formattedLongString, itemVariants } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Button } from "../ui/button";
-import { SendIcon, XIcon } from "lucide-react";
+import { Lock, SendIcon, XIcon } from "lucide-react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { ScrollArea } from "../ui/scroll-area";
@@ -22,7 +22,7 @@ import {
     TableHeader,
     TableRow,
 } from "../ui/table";
-import { IUser } from "@/types/user";
+import { IBillingTransaction, IUser } from "@/types/user";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { toast } from "sonner";
 import { generateBatchTransaction } from "@/lib/wallet/generateBatchedTranasactions";
@@ -30,16 +30,19 @@ import { Transaction } from "@solana/web3.js";
 import { useSession } from "next-auth/react";
 import { BalanceContext } from "@/contexts/BalanceContext";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface IProps {
     selectedUsers: IUser[];
     handleUserSelection: (id: string) => void;
     setSelectedUsers: (user: []) => void;
+    userPlanDetails: IBillingTransaction;
 }
 const InitiateTransaction = ({
     selectedUsers,
     handleUserSelection,
     setSelectedUsers,
+    userPlanDetails,
 }: IProps) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [solAmount, setSolAmount] = useState<number>(0);
@@ -174,21 +177,45 @@ const InitiateTransaction = ({
     const isBalanceSufficient = () => {
         return calculateTotalAmount() <= walletBalance;
     };
+
     return (
         <div>
             <motion.div variants={itemVariants} className="flex justify-end">
-                <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+                <Dialog
+                    open={isModalOpen}
+                    onOpenChange={
+                        userPlanDetails.transactions >= selectedUsers.length
+                            ? setIsModalOpen
+                            : () => {}
+                    }
+                >
                     <DialogTrigger asChild>
-                        <Button
-                            disabled={selectedUsers.length === 0}
-                            className="transition-all duration-300 hover:scale-105 w-full sm:w-auto"
-                        >
-                            <SendIcon className="mr-2 h-4 w-4" />
-                            <span className="hidden sm:inline">
-                                Initiate Transfer
-                            </span>
-                            <span className="sm:hidden">Transfer</span>
-                        </Button>
+                        {userPlanDetails.transactions >=
+                        selectedUsers.length ? (
+                            <Button
+                                disabled={selectedUsers.length === 0}
+                                className="transition-all duration-300 hover:scale-105 w-full sm:w-auto"
+                            >
+                                <SendIcon className="mr-2 h-4 w-4" />
+                                <span className="hidden sm:inline">
+                                    Initiate Transfer
+                                </span>
+                                <span className="sm:hidden">Transfer</span>
+                            </Button>
+                        ) : (
+                            <Link href={"/v1/billing"}>
+                                <Button
+                                    disabled={selectedUsers.length === 0}
+                                    className="transition-all duration-300 hover:scale-105 w-full sm:w-auto"
+                                >
+                                    <Lock className="mr-2 h-4 w-4" />
+                                    <span className="hidden sm:inline">
+                                        Please upgrage
+                                    </span>
+                                    <span className="sm:hidden">Transfer</span>
+                                </Button>
+                            </Link>
+                        )}
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[425px] text-slate-950 bg-slate-50">
                         <DialogHeader>
