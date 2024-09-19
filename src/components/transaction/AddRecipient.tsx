@@ -18,14 +18,14 @@ import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { UserPlusIcon } from "lucide-react";
 import { countries } from "@/lib/countryList";
-import { IRecipient } from "@/types/user";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 
 interface IProps {
     setIsAddUserDialogOpen: (res: boolean) => void;
+    fetchData: () => void;
 }
-const AddRecipient = ({ setIsAddUserDialogOpen }: IProps) => {
+const AddRecipient = ({ setIsAddUserDialogOpen, fetchData }: IProps) => {
     const [newUser, setNewUser] = useState({
         name: "",
         email: "",
@@ -73,6 +73,7 @@ const AddRecipient = ({ setIsAddUserDialogOpen }: IProps) => {
                 walletAddress: "",
                 country: "",
             });
+            fetchData();
             setIsAddUserDialogOpen(false);
 
             toast.success(data.message || "Recipient saved successfully");
