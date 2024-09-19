@@ -21,6 +21,14 @@ const Dashboard = () => {
             setData(result.data);
         } catch (error) {
             console.log({ error });
+            setData({
+                totalUsers: 0,
+                totalTransactions: 0,
+                incrementByWeek: "+0.01% from last week",
+                incrementByMonth: "+0.1% from last month",
+                latestTransactions: [],
+            });
+
             setDataError((error as Error).message);
         }
     };
