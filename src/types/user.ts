@@ -22,7 +22,7 @@ export interface IUserDashboardDetails {
     totalTransactions: number;
     incrementByWeek: string;
     incrementByMonth: string;
-    latestTransactions: IUserTransaction[];
+    latestTransactions: IUserTransaction[] | null;
 }
 
 export interface IRecipient {
@@ -46,4 +46,32 @@ export interface IUser {
     walletAddress: string;
     country: string;
     createdAt: string;
+}
+
+export interface IBillingPlan {
+    planDetails: {
+        name: string;
+        createdAt: string;
+        features: string[];
+        price: number;
+        signature: string;
+        transactions: number;
+        color: string;
+        description: string;
+    };
+    userDetails: {
+        email: string;
+        name: string;
+        walletAddress: string;
+        transactions: {
+            name: string;
+            price: number;
+            transactions: number;
+            description: string;
+            features: string[];
+            color: string;
+            createdAt: string;
+            signature: string;
+        }[];
+    };
 }
