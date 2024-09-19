@@ -29,6 +29,7 @@ import { generateBatchTransaction } from "@/lib/wallet/generateBatchedTranasacti
 import { Transaction } from "@solana/web3.js";
 import { useSession } from "next-auth/react";
 import { BalanceContext } from "@/contexts/BalanceContext";
+import { useRouter } from "next/navigation";
 
 interface IProps {
     selectedUsers: IUser[];
@@ -52,6 +53,7 @@ const InitiateTransaction = ({
     const { walletBalance, updateBalance } = balanceContext;
 
     console.log({ walletBalance });
+    const router = useRouter();
     const executeBatchTransaction = async (transactionList: Transaction[]) => {
         const results: string[] = [];
         for (let index = 0; index < transactionList.length; index++) {
@@ -151,6 +153,7 @@ const InitiateTransaction = ({
                 setSelectedUsers([]);
                 setIsSending(false);
                 toast.success("Transaction successful!");
+                router.push("/v1/transaction-history");
                 return;
             }
 
