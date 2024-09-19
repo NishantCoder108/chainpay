@@ -21,11 +21,14 @@ import { useSession } from "next-auth/react";
 import TableLoader from "../common/TableLoader";
 import CopyToClipboard from "../common/CopyToClipboard";
 import FilterRecipient from "./FilterRecipient";
-import { IFilters, IUser } from "@/types/user";
+import { IBillingTransaction, IFilters, IUser } from "@/types/user";
 import InitiateTransaction from "./InitiateTransaction";
 
 export default function RecipientManagement() {
     const [users, setUsers] = useState<IUser[]>([]);
+    const [userPlanDetails, setUserPlanDetails] = useState<IBillingTransaction>(
+        {} as IBillingTransaction
+    );
     const [selectedUsers, setSelectedUsers] = useState<IUser[]>([]);
     const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
     const { data: session } = useSession();
@@ -101,12 +104,35 @@ export default function RecipientManagement() {
 
             const resData = await res.json();
 
+            if (!resData.plan) {
+                setUserPlanDetails({
+                    name: "Basic",
+                    price: 0,
+                    transactions: 3,
+                    description: "Basic",
+                    features: ["Up to 3 bulk transactions"],
+                    color: "bg-gray-100",
+                    createdAt: "",
+                    signature: "",
+                });
+            } else {
+                setUserPlanDetails(resData.plan);
+            }
             setUsers(resData.data);
             setLoadingTable(false);
         } catch (error) {
             console.log({ error });
             setLoadingTable(false);
-
+            setUserPlanDetails({
+                name: "Basic",
+                price: 0,
+                transactions: 3,
+                description: "Basic",
+                features: ["Up to 3 bulk transactions"],
+                color: "bg-gray-100",
+                createdAt: "",
+                signature: "",
+            });
             setUsers([]);
         }
     };
@@ -234,6 +260,7 @@ export default function RecipientManagement() {
                 selectedUsers={selectedUsers}
                 handleUserSelection={handleUserSelection}
                 setSelectedUsers={setSelectedUsers}
+                userPlanDetails={userPlanDetails}
             />
         </motion.div>
     );
