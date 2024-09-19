@@ -136,6 +136,7 @@ export default function RecipientManagement() {
                                     setIsAddUserDialogOpen={
                                         setIsAddUserDialogOpen
                                     }
+                                    fetchData={fetchData}
                                 />
                             </Dialog>
                         </div>
