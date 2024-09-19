@@ -1,5 +1,6 @@
 "use client";
 import BillingManagement from "@/components/billing/BillingManagement";
+import { IBillingPlan } from "@/types/user";
 import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
 
@@ -12,19 +13,23 @@ export type Plan = {
     color: string;
     createdAt?: string;
 };
+
 const BillingDashboard = () => {
-    const [billingData, setBillingData] = useState<Plan>({} as Plan);
+    const [billingData, setBillingData] = useState<IBillingPlan>(
+        {} as IBillingPlan
+    );
     const { data: session } = useSession();
 
     const fetchData = async () => {
         try {
             const res = await fetch(
-                `/api/v1/billing?userId${session?.user.userId}`
+                `/api/v1/billing?userId=${session?.user.userId}`
             );
 
             if (!res.ok) throw new Error("Failed to fetch data.");
             const resData = await res.json();
-            setBillingData(resData.data);
+            console.log({ resData });
+            setBillingData(resData);
         } catch (error) {
             console.log({ error });
         }
@@ -33,6 +38,8 @@ const BillingDashboard = () => {
     useEffect(() => {
         fetchData();
     }, []);
+
+    console.log({ billingData });
     return (
         <div>
             <BillingManagement plans={plans} billingData={billingData} />
