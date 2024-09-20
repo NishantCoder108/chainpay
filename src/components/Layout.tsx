@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import ConnectWallet from "./wallets/ConnectWallet";
 import { signOut } from "next-auth/react";
+import { useNetwork } from "@/contexts/NetworkContext";
 
 const navItems = [
     { icon: LayoutDashboardIcon, label: "Dashboard", path: "/v1/dashboard" },
@@ -49,7 +50,9 @@ const navItems = [
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-    const [network, setNetwork] = useState("devnet");
+    const { network, setNetwork } = useNetwork();
+
+    // const [network, setNetwork] = useState("devnet");
 
     const pathname = usePathname();
 
