@@ -1,14 +1,18 @@
+import { useSession } from "next-auth/react";
 import { NextResponse } from "next/server";
 import type { NextFetchEvent, NextRequest } from "next/server";
 
 export function middleware(req: NextRequest, event: NextFetchEvent) {
-    const token = req.cookies.get("token");
-    const url = req.nextUrl.clone(); // copy the current url
+    const allCookies = req.cookies.getAll();
+    const url = req.nextUrl.clone();
 
-    console.log("Token data:", { token });
-    console.log("Pathname:", url.pathname);
+    const token = allCookies[0].value || undefined;
+    // console.log("allCookies:", allCookies);
+    // console.log("Pathname:", url.pathname);
+
     const requestUrl = req.url;
-    console.log("Request Url", requestUrl);
+    // console.log("Request Url", requestUrl);
+
     const protectedPageRoutes = [
         "v1/billing",
         "v1/addRecipient",
