@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/card";
 import { ArrowRight, Send, Shield, Zap } from "lucide-react";
 import { handleSignIn } from "@/app/actions/dashboardAction";
+import Footer from "../common/Footer";
 
 export default function HomePage() {
     return (
@@ -155,11 +156,7 @@ export default function HomePage() {
             </section>
 
             {/* Footer */}
-            <footer className="py-10 bg-gray-100">
-                <div className="container mx-auto px-4 text-center">
-                    <p>&copy; 2024 ChainPay. All rights reserved.</p>
-                </div>
-            </footer>
+            <Footer />
         </div>
     );
 }
