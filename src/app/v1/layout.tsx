@@ -34,6 +34,11 @@ const Homepage = ({ children }: { children: React.ReactNode }) => {
         router.push("/");
         return null;
     } else {
+        if (process.env.NODE_ENV === "production") {
+            console.log = () => {};
+            console.warn = () => {};
+            console.error = () => {};
+        }
         return (
             <NetworkProvider>
                 <ConnectionProvider endpoint={solanaUrl as string}>

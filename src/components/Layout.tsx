@@ -92,6 +92,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
+    if (process.env.NODE_ENV === "production") {
+        console.log = () => {};
+        console.warn = () => {};
+        console.error = () => {};
+    }
     return (
         <div className="flex h-screen bg-gray-100  dark:bg-gray-900">
             {/* Sidebar */}

@@ -55,6 +55,11 @@ export default function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
+    if (process.env.NODE_ENV === "production") {
+        console.log = () => {};
+        console.warn = () => {};
+        console.error = () => {};
+    }
     return (
         <SessionWrapper>
             <html lang="en">
