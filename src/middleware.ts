@@ -6,8 +6,8 @@ export function middleware(req: NextRequest, event: NextFetchEvent) {
     const allCookies = req.cookies.getAll();
     const url = req.nextUrl.clone();
 
-    const token = allCookies[0].value || undefined;
-    // console.log("allCookies:", allCookies);
+    const token = allCookies[0]?.value || undefined;
+    console.log("allCookies:", allCookies);
     // console.log("Pathname:", url.pathname);
 
     const requestUrl = req.url;
