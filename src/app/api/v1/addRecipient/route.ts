@@ -61,6 +61,7 @@ export async function GET(req: NextRequest) {
         }
 
         const allUsers = await AdminUser.findById({ _id: userId })
+            .populate("plan")
             .populate("recipients")
             .exec();
 
@@ -71,6 +72,7 @@ export async function GET(req: NextRequest) {
         return NextResponse.json(
             {
                 data: allUsers.recipients,
+                plan: allUsers.plan,
             },
             { status: 200 }
         );
