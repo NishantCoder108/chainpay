@@ -1,49 +1,25 @@
-import mongoose, { Mongoose } from "mongoose";
+import mongoose, { Connection } from "mongoose";
 
-const MONGODB_URI = process.env.MONGO_URI as string;
+const uri: string =
+    process.env.MONGO_URI || "mongodb://localhost:27017/chainpayDb";
 
-if (!MONGODB_URI) {
-    throw new Error(
-        "Please define the MONGO_URI environment variable inside .env.local"
-    );
-}
+let cachedConnection: Connection | null = null;
 
-interface Cached {
-    conn: Mongoose | null;
-    promise: Promise<Mongoose> | null;
-}
-const cached = (globalThis.mongoose as Cached) || { conn: null, promise: null };
-async function dbConnect(): Promise<Mongoose> {
-    if (cached.conn) {
-        return cached.conn;
-    }
-
-    if (!cached.promise) {
-        const opts = {
-            bufferCommands: false,
-        };
-
-        cached.promise = mongoose
-            .connect(MONGODB_URI, opts)
-            .then((mongooseInstance) => {
-                console.log("Connected to MongoDB");
-                return mongooseInstance;
-            })
-            .catch((error) => {
-                console.error("Failed to connect to MongoDB", error);
-                throw error;
-            });
+const connectDB = async (): Promise<Connection> => {
+    if (cachedConnection) {
+        return cachedConnection;
     }
 
     try {
-        cached.conn = await cached.promise;
+        const connection = await mongoose.connect(uri);
+
+        console.log("MongoDB connected successfully");
+        cachedConnection = connection.connection;
     } catch (error) {
-        cached.promise = null;
-        console.error("Database connection error", error);
-        throw error;
+        console.error("Error connecting to MongoDB:", error);
     }
 
-    return cached.conn;
-}
+    return cachedConnection as Connection;
+};
 
-export default dbConnect;
+export default connectDB;
