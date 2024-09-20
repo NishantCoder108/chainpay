@@ -12,12 +12,7 @@ interface Cached {
     conn: Mongoose | null;
     promise: Promise<Mongoose> | null;
 }
-
-const cached: Cached = (globalThis.mongoose as Cached) || {
-    conn: null,
-    promise: null,
-};
-
+const cached = (globalThis.mongoose as Cached) || { conn: null, promise: null };
 async function dbConnect(): Promise<Mongoose> {
     if (cached.conn) {
         return cached.conn;
