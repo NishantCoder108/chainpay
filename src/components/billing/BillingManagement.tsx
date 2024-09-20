@@ -174,7 +174,7 @@ export default function BillingManagement({ plans, billingData }: IProps) {
                     className="mb-12 "
                 >
                     (
-                    <Card className={`${billingData.planDetails.color}`}>
+                    <Card className={`${billingData?.planDetails?.color}`}>
                         <CardHeader>
                             <CardTitle className="text-2xl">
                                 Your Current Subscription
@@ -187,11 +187,11 @@ export default function BillingManagement({ plans, billingData }: IProps) {
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-3xl font-bold">
-                                        {billingData.planDetails.name} Plan
+                                        {billingData?.planDetails?.name} Plan
                                     </p>
                                     <p className="text-xl text-muted-foreground">
-                                        {billingData.planDetails.price} SOL per
-                                        month
+                                        {billingData?.planDetails?.price} SOL
+                                        per month
                                     </p>
                                 </div>
                                 <CreditCard className="h-12 w-12 text-primary" />
@@ -199,7 +199,8 @@ export default function BillingManagement({ plans, billingData }: IProps) {
                             <p className="text-sm text-muted-foreground">
                                 Subscribed since:{" "}
                                 {formatDate(
-                                    billingData.planDetails.createdAt,
+                                    billingData?.planDetails?.createdAt ||
+                                        new Date(),
                                     "PPpp"
                                 )}
                             </p>
@@ -294,13 +295,13 @@ export default function BillingManagement({ plans, billingData }: IProps) {
                                     }
                                     disabled={
                                         (Object.keys(billingData).length > 0 &&
-                                            billingData.planDetails.name ===
+                                            billingData?.planDetails?.name ===
                                                 plan.name) ||
                                         plan.name === "Basic"
                                     }
                                 >
                                     {Object.keys(billingData).length > 0 &&
-                                    billingData.planDetails.name === plan.name
+                                    billingData?.planDetails?.name === plan.name
                                         ? "Current Plan"
                                         : "Select Plan"}
                                 </Button>
