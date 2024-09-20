@@ -1,10 +1,13 @@
 import { Connection, PublicKey } from "@solana/web3.js";
 
-const endpoint = process.env.NEXT_PUBLIC_RPC_URL as string;
+// const endpoint = process.env.NEXT_PUBLIC_RPC_URL as string;
 
-export async function getBalance(publicKey: PublicKey) {
+export async function getBalance(
+    publicKey: PublicKey,
+    rpcURL: string | undefined
+) {
     try {
-        const connection = new Connection(endpoint);
+        const connection = new Connection(rpcURL || "");
 
         const balanceLamports = await connection.getBalance(
             publicKey,
