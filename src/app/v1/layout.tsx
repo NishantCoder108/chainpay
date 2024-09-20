@@ -11,12 +11,14 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { BalanceProvider } from "@/contexts/BalanceContext";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { NetworkProvider, useNetwork } from "@/contexts/NetworkContext";
 
 const Homepage = ({ children }: { children: React.ReactNode }) => {
     const { data: session } = useSession();
     const router = useRouter();
+    const { solanaUrl } = useNetwork();
 
-    const endpoint = process.env.NEXT_PUBLIC_RPC_URL as string;
+    // const endpoint = process.env.NEXT_PUBLIC_RPC_URL as string;
     console.log({ session });
     const [hasMounted, setHasMounted] = useState(false);
 
@@ -33,15 +35,17 @@ const Homepage = ({ children }: { children: React.ReactNode }) => {
         return null;
     } else {
         return (
-            <ConnectionProvider endpoint={endpoint}>
-                <WalletProvider wallets={[]} autoConnect>
-                    <BalanceProvider>
-                        <TooltipProvider>
-                            <AppLayout>{children}</AppLayout>
-                        </TooltipProvider>
-                    </BalanceProvider>
-                </WalletProvider>
-            </ConnectionProvider>
+            <NetworkProvider>
+                <ConnectionProvider endpoint={solanaUrl as string}>
+                    <WalletProvider wallets={[]} autoConnect>
+                        <BalanceProvider>
+                            <TooltipProvider>
+                                <AppLayout>{children}</AppLayout>
+                            </TooltipProvider>
+                        </BalanceProvider>{" "}
+                    </WalletProvider>
+                </ConnectionProvider>
+            </NetworkProvider>
         );
     }
 };
