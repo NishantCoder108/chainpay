@@ -80,7 +80,7 @@ export default function HomePage() {
                     <div className="aspect-w-16 aspect-auto max-w-4xl mx-auto">
                         <iframe
                             className="w-full h-full"
-                            src="https://www.youtube.com/embed/68IcEa2BRC8"
+                            src={`https://www.youtube.com/embed/${process.env.NEXT_PUBLIC_YOUTUBE_ID}`}
                             title="Product Demo"
                             frameBorder="0"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -144,6 +144,7 @@ export default function HomePage() {
                         errors with our bulk transaction platform.
                     </p>
                     <Button
+                        onClick={() => handleSignIn()}
                         size="lg"
                         className="bg-white text-black hover:bg-gray-200"
                     >
