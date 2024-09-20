@@ -6,7 +6,6 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { ArrowRight, Send, Shield, Zap } from "lucide-react";
-import { handleSignIn } from "@/app/actions/dashboardAction";
 import Footer from "../common/Footer";
 import { signIn } from "next-auth/react";
 
