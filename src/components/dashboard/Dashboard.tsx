@@ -8,6 +8,7 @@ import {
 import { ArrowRight, Send, Shield, Zap } from "lucide-react";
 import { handleSignIn } from "@/app/actions/dashboardAction";
 import Footer from "../common/Footer";
+import { signIn } from "next-auth/react";
 
 export default function HomePage() {
     return (
@@ -23,7 +24,7 @@ export default function HomePage() {
                         with just one click.
                     </p>
                     <Button
-                        onClick={() => handleSignIn()}
+                        onClick={() => signIn("google")}
                         size="lg"
                         className="bg-white text-black hover:bg-gray-200"
                     >
@@ -145,7 +146,7 @@ export default function HomePage() {
                         errors with our bulk transaction platform.
                     </p>
                     <Button
-                        onClick={() => handleSignIn()}
+                        onClick={() => signIn()}
                         size="lg"
                         className="bg-white text-black hover:bg-gray-200"
                     >
