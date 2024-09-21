@@ -101,13 +101,25 @@ export async function GET(req: NextRequest) {
 
         if (!userWithPlan) throw new Error("User not found");
 
+        const basicPlan = {
+            name: "Basic",
+            price: 0,
+            transactions: 3,
+            description: "For individuals and small teams",
+            features: [
+                "Up to 3 bulk transactions",
+                "Basic analytics",
+                "Email support",
+            ],
+            color: "bg-gray-100",
+        };
+
         return NextResponse.json(
             {
-                planDetails: userWithPlan.plan,
+                planDetails: userWithPlan.plan ? userWithPlan.plan : basicPlan,
                 userDetails: {
                     name: userWithPlan.name,
                     email: userWithPlan.email,
-                    walletAddress: userWithPlan.walletAddress,
                     transactions: userWithPlan.billing,
                 },
             },
