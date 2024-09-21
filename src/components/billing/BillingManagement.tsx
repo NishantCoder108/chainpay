@@ -166,12 +166,14 @@ export default function BillingManagement({ plans, billingData }: IProps) {
             animate="visible"
             className="container mx-auto py-10 px-4 sm:px-6 lg:px-8"
         >
-            {Object.keys(billingData).length !== 0 && !isManagingSubs ? (
+            {Object.keys(billingData).length > 0 &&
+            billingData?.planDetails?.name !== "Basic" &&
+            !isManagingSubs ? (
                 <motion.div
                     variants={itemVariants}
                     initial="hidden"
                     animate="visible"
-                    className="mb-12 "
+                    // className="mb-12 "
                 >
                     (
                     <Card className={`${billingData?.planDetails?.color}`}>
@@ -228,10 +230,13 @@ export default function BillingManagement({ plans, billingData }: IProps) {
                         Choose Your Plan
                     </h1>
                     <p className="text-xl mb-4 text-black">
-                        You are not currently subscribed to any plan.
+                        {billingData?.planDetails?.name === "Basic" ||
+                        !billingData?.planDetails
+                            ? "You are currently not subscribed to any plan."
+                            : "Please upgrade your subscription to continue using our services."}
                     </p>
                     <p className="text-muted-foreground">
-                        Choose a plan below to get started with our services.
+                        Select a plan below to get started.
                     </p>
                 </motion.div>
             )}
@@ -242,7 +247,9 @@ export default function BillingManagement({ plans, billingData }: IProps) {
                 animate="visible"
                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12"
             >
-                {(isManagingSubs || Object.keys(billingData).length === 0) &&
+                {(isManagingSubs ||
+                    Object.keys(billingData).length === 0 ||
+                    billingData?.planDetails?.name === "Basic") &&
                     plans.map((plan) => (
                         <Card
                             key={plan.name}
@@ -284,8 +291,8 @@ export default function BillingManagement({ plans, billingData }: IProps) {
                                 <Button
                                     className={
                                         plan.name === "Gold"
-                                            ? "w-full"
-                                            : "w-full bg-slate-100"
+                                            ? "w-full "
+                                            : "w-full bg-slate-100 "
                                     }
                                     onClick={() => handleSelectPlan(plan)}
                                     variant={
@@ -310,123 +317,134 @@ export default function BillingManagement({ plans, billingData }: IProps) {
                     ))}
             </motion.div>
 
-            {Object.keys(billingData).length !== 0 && !isManagingSubs && (
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="text-2xl">
-                            Billing Details
-                        </CardTitle>
-                        <CardDescription>
-                            Your account and transaction information
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <Tabs defaultValue="account" className="w-full">
-                            <TabsList className="grid w-full grid-cols-2">
-                                <TabsTrigger
-                                    value="account"
-                                    className="data-[state=active]:bg-white data-[state=active]:text-black"
-                                >
-                                    Account Info
-                                </TabsTrigger>
-                                <TabsTrigger
-                                    value="transactions"
-                                    className="data-[state=active]:bg-white data-[state=active]:text-black"
-                                >
-                                    Transactions
-                                </TabsTrigger>
-                            </TabsList>
-                            <TabsContent value="account">
-                                <div className="space-y-4 mt-4">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div>
-                                            <p className="text-sm font-medium text-muted-foreground">
-                                                Name
-                                            </p>
-                                            <p className="text-lg">
-                                                {billingData.userDetails.name}
-                                            </p>
+            {Object.keys(billingData).length > 0 &&
+                billingData?.planDetails?.name !== "Basic" &&
+                !isManagingSubs && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-2xl">
+                                Billing Details
+                            </CardTitle>
+                            <CardDescription>
+                                Your account and transaction information
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <Tabs defaultValue="account" className="w-full">
+                                <TabsList className="grid w-full grid-cols-2">
+                                    <TabsTrigger
+                                        value="account"
+                                        className="data-[state=active]:bg-white data-[state=active]:text-black"
+                                    >
+                                        Account Info
+                                    </TabsTrigger>
+                                    <TabsTrigger
+                                        value="transactions"
+                                        className="data-[state=active]:bg-white data-[state=active]:text-black"
+                                    >
+                                        Transactions
+                                    </TabsTrigger>
+                                </TabsList>
+                                <TabsContent value="account">
+                                    <div className="space-y-4 mt-4">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <p className="text-sm font-medium text-muted-foreground">
+                                                    Name
+                                                </p>
+                                                <p className="text-lg">
+                                                    {
+                                                        billingData.userDetails
+                                                            .name
+                                                    }
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <p className="text-sm font-medium text-muted-foreground">
+                                                    Email
+                                                </p>
+                                                <p className="text-lg">
+                                                    {
+                                                        billingData.userDetails
+                                                            .email
+                                                    }
+                                                </p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p className="text-sm font-medium text-muted-foreground">
-                                                Email
-                                            </p>
-                                            <p className="text-lg">
-                                                {billingData.userDetails.email}
-                                            </p>
-                                        </div>
+                                        {wallet.publicKey && (
+                                            <div>
+                                                <p className="text-sm font-medium text-muted-foreground">
+                                                    Wallet Address
+                                                </p>
+                                                <p className="text-lg font-mono">
+                                                    {wallet.publicKey?.toBase58()}
+                                                </p>
+                                            </div>
+                                        )}
                                     </div>
-                                    <div>
-                                        <p className="text-sm font-medium text-muted-foreground">
-                                            Wallet Address
-                                        </p>
-                                        <p className="text-lg font-mono">
-                                            {wallet.publicKey &&
-                                                wallet.publicKey?.toBase58()}
-                                        </p>
+                                </TabsContent>
+                                <TabsContent value="transactions">
+                                    <div className="overflow-x-auto">
+                                        <Table>
+                                            <TableHeader>
+                                                <TableRow>
+                                                    <TableHead>
+                                                        Subscription Plan
+                                                    </TableHead>
+                                                    <TableHead className="">
+                                                        <p> CreatedAt </p>
+                                                    </TableHead>
+                                                    <TableHead className="">
+                                                        <p>Signature </p>
+                                                    </TableHead>
+                                                </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                                {billingData.userDetails.transactions.map(
+                                                    (tx, index) => (
+                                                        <TableRow key={index}>
+                                                            <TableCell className="font-bold">
+                                                                {tx.name}
+                                                            </TableCell>
+                                                            <TableCell className="">
+                                                                {formatDate(
+                                                                    tx.createdAt,
+                                                                    "PPpp"
+                                                                )}
+                                                            </TableCell>
+                                                            <TableCell className="font-mono text-sm">
+                                                                <Link
+                                                                    href={`https://explorer.solana.com/tx/${tx.signature}`}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="flex items-center gap-1 text-blue-500 hover:text-blue-700"
+                                                                >
+                                                                    {tx.signature.slice(
+                                                                        0,
+                                                                        12
+                                                                    )}
+                                                                    ...
+                                                                    {tx.signature.slice(
+                                                                        -12
+                                                                    )}
+                                                                    <ExternalLinkIcon
+                                                                        size={
+                                                                            12
+                                                                        }
+                                                                    />
+                                                                </Link>
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    )
+                                                )}
+                                            </TableBody>
+                                        </Table>
                                     </div>
-                                </div>
-                            </TabsContent>
-                            <TabsContent value="transactions">
-                                <div className="overflow-x-auto">
-                                    <Table>
-                                        <TableHeader>
-                                            <TableRow>
-                                                <TableHead>
-                                                    Subscription Plan
-                                                </TableHead>
-                                                <TableHead className="">
-                                                    <p> CreatedAt </p>
-                                                </TableHead>
-                                                <TableHead className="">
-                                                    <p>Signature </p>
-                                                </TableHead>
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {billingData.userDetails.transactions.map(
-                                                (tx, index) => (
-                                                    <TableRow key={index}>
-                                                        <TableCell className="font-bold">
-                                                            {tx.name}
-                                                        </TableCell>
-                                                        <TableCell className="">
-                                                            {formatDate(
-                                                                tx.createdAt,
-                                                                "PPpp"
-                                                            )}
-                                                        </TableCell>
-                                                        <TableCell className="font-mono text-sm">
-                                                            <Link
-                                                                href={`https://explorer.solana.com/tx/${tx.signature}`}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="flex items-center gap-1 text-blue-500 hover:text-blue-700"
-                                                            >
-                                                                {tx.signature.slice(
-                                                                    0,
-                                                                    12
-                                                                )}
-                                                                ...
-                                                                {tx.signature.slice(
-                                                                    -12
-                                                                )}
-                                                                <ExternalLinkIcon
-                                                                    size={12}
-                                                                />
-                                                            </Link>
-                                                        </TableCell>
-                                                    </TableRow>
-                                                )
-                                            )}
-                                        </TableBody>
-                                    </Table>
-                                </div>
-                            </TabsContent>
-                        </Tabs>
-                    </CardContent>
-                </Card>
-            )}
+                                </TabsContent>
+                            </Tabs>
+                        </CardContent>
+                    </Card>
+                )}
 
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                 <DialogContent
